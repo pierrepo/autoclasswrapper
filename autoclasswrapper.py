@@ -10,7 +10,6 @@ import pandas as pd
 
 logging.basicConfig(level=logging.DEBUG)
 
-
 class CastFloat64(Exception):
     """
     Exception raised when data column cannot be casted to float64
@@ -19,6 +18,14 @@ class CastFloat64(Exception):
     def __init__(self, message):
         self.message = message
 
+
+class DuplicateColumnName(Exception):
+    """
+    Exception raised when column names are identical
+    """
+
+    def __init__(self, message):
+        self.message = message
 
 class Process():
     """
@@ -31,10 +38,11 @@ class Process():
         """
         self.inputfolder = inputfolder
         self.missing_encoding = missing_encoding
-        self.tolerate_error = tolerate_error
 
         self.datasets = []
         self.df = None
+
+        self.tolerate_error = tolerate_error
         self.had_error = False
 
 
@@ -67,79 +75,23 @@ class Process():
         """
         Add input data for clustering
         """
-        input_data = Data(input_file, input_type, input_error)
-        self.read_datafile(input_data)
-        self.clean_column_names(input_data)
-        self.check_data_type(input_data)
+        dataset = Dataset(input_file, input_type, input_error)
+        logging.info("Reading data file {}".format(input_file))
+        dataset.check_duplicate_col_names()
+        dataset.read_datafile()
+        dataset.clean_column_names()
+        dataset.check_data_type()
         self.check_missing_values(input_data)
         self.datasets.append(input_data)
 
 
-    @handle_error
-    def read_datafile(self, dataset):
-        """
-        Read datafile as pandas dataframe
-        """
-        logging.info("Reading {}".format(dataset.input_file))
-        # header is on first row (header=0)
-        # gene/protein/orf names are on first column (index_col=0)
-        dataset.df = pd.read_table(dataset.input_file, sep='\t', header=0, index_col=0)
-        nrows, ncols = dataset.df.shape
-        logging.info("Found {} rows and {} columns"
-                     .format(nrows, ncols+1))
 
 
-    @handle_error
-    def clean_column_names(self, dataset):
-        """
-        Cleanup column names
-        """
-        regex = re.compile('[^A-Za-z0-9 .-]+')
-        logging.debug("Checking column names")
-        # check index column name first
-        col_name = dataset.df.index.name
-        col_name_new = regex.sub("_", col_name)
-        if col_name_new != col_name:
-            dataset.df.index.name = col_name_new
-            logging.warning("Column '{}' renamed to '{}'"
-                            .format(col_name, col_name_new))
-        # then other column names
-        for col_name in dataset.df.columns:
-            col_name_new = regex.sub("_", col_name)
-            if col_name_new != col_name:
-                dataset.df.rename(columns={col_name: col_name_new}, inplace=True)
-                logging.warning("Column '{}' renamed to '{}'"
-                                .format(col_name, col_name_new))
-        # print all columns names
-        logging.debug("Index name: ''{}'".format(dataset.df.index.name))
-        for name in dataset.df.columns:
-            logging.debug("Column name: '{}'".format(name))
 
 
-    @handle_error
-    def check_data_type(self, dataset):
-        """
-        check data type
-        """
-        logging.info("Checking data format")
-        if dataset.data_type in ['scalar', 'linear']:
-            for col in dataset.df.columns:
-                self.check_data_numeric(dataset, col)
 
 
-    @handle_error
-    def check_data_numeric(self, dataset, col):
-        """
-        Verify that column is realy numeric
-        """
-        try:
-            dataset.df[col].astype('float64')
-            logging.info("Column '{}'\n".format(col)
-                         +dataset.df[col].describe(percentiles=[]).to_string())
-        except:
-            msg  = "Cannot cast column '{}' to float\n".format(col)
-            msg += "Check your input file!"
-            raise CastFloat64(msg)
+
 
 
     @handle_error
@@ -155,13 +107,18 @@ class Process():
             logging.warning('Missing values found in columns: {}'
                             .format(" ".join(columns_with_missing)))
         else:
-            logging.info('No missing values found.')
+            logging.info('No missing values found')
 
 
     @handle_error
     def merge_dataframes(self):
         """
         Merge input datasets
+
+        Dataframes are merged based on an 'outer' join
+        https://pandas.pydata.org/pandas-docs/stable/merging.html
+        - all lines are kept
+        - missing data might appear
         """
         if len(self.datasets) == 1:
             self.df = self.datasets[0].df
@@ -170,21 +127,31 @@ class Process():
             df_lst = []
             for dataset in self.datasets:
                 df_lst.append(dataset.df)
-            # https://pandas.pydata.org/pandas-docs/stable/merging.html
             self.df = pd.concat(df_lst, axis=1, join="outer")
+            # check for identical column names
+            if len(set(self.df.columns)) != len(list(self.df.columns)):
+                msg  = "Found duplicate column names in merged data:\n"
+                msg += " ".join(self.df.columns)
+                raise DuplicateColumnName(msg)
+        print(len(set(self.df.columns)))
+        print(len(list(self.df.columns)))
         nrows, ncols = self.df.shape
-        logging.info("Final datafram has {} lines and {} columns".format(nrows, ncols+1))
+        logging.info("Final dataframe has {} lines and {} columns"
+                     .format(nrows, ncols+1))
 
 
     @handle_error
-    def create_db2_file(self):
+    def create_db2_file(self, filename="clust"):
         """
         create .db2 file
         """
-        logging.info("Writing .db2 file")
-        logging.info("If any, missing values will be encoded as: {}".format(self.missing_encoding))
+        db2_name = filename + ".db2"
+        tsv_name = filename + ".tsv"
+        logging.info("Writing {} file".format(db2_name))
+        logging.info("If any, missing values will be encoded as '{}'"
+                     .format(self.missing_encoding))
         self.df.to_csv("clust.db2", header=False, sep="\t", na_rep=self.missing_encoding)
-        logging.debug("Writing .tsv file [for later use]")
+        logging.debug("Writing {} file [for later use]".format(tsv_name))
         self.df.to_csv("clust.tsv", header=True, sep="\t", na_rep="")
 
 
@@ -333,7 +300,7 @@ class Process():
         print(" ".join(proc.args))
         return True
 
-    """
+    '''
     @handle_error
     def set_password(self, password_length):
         """
@@ -347,7 +314,7 @@ class Process():
         with open('access', 'w') as accessfile:
             accessfile.write(token)
         return token
-    """
+    '''
 
     @handle_error
     def print_files(self):
@@ -394,10 +361,11 @@ class Process():
             self.df.sort(['cluster_class'], ascending=[True], inplace=True)
 
 
-class Data():
+class Dataset():
     """
     Class to handle autoclass data files
     """
+
 
     def __init__(self, input_file='', data_type='', error=0.0):
         """
@@ -425,3 +393,87 @@ class Data():
         self.clean_column_names()
         self.check_data_type()
         self.check_missing_values()
+
+
+    def raise_on_duplicates(self, input_list):
+        """
+        Verify if a list as duplicated values
+        """
+        if len(input_list) != len(set(input_list)):
+            msg  = "Found duplicate column names:\n"
+            msg += " ".join(input_list)
+            msg += "\nPlease clean your header"
+            raise DuplicateColumnName(msg)
+
+
+    def check_duplicate_col_names(self):
+        """
+        Check duplicate column clean_column_names
+        """
+        with open(self.input_file) as f_in:
+            header = f_in.readline().strip().split("\t")
+            self.raise_on_duplicates(header)
+
+
+    def read_datafile(self):
+        """
+        Read data file as pandas dataframe
+
+        Header is on first row (header=0)
+        Gene/protein/orf names are on first column (index_col=0)
+        """
+        self.df = pd.read_table(self.input_file, sep='\t', header=0, index_col=0)
+        nrows, ncols = self.df.shape
+        logging.info("Found {} rows and {} columns"
+                     .format(nrows, ncols+1))
+
+
+    def clean_column_names(self):
+        """
+        Cleanup column names
+        """
+        regex = re.compile('[^A-Za-z0-9 .-]+')
+        logging.debug("Checking column names")
+        # check index column name first
+        col_name = self.df.index.name
+        col_name_new = regex.sub("_", col_name)
+        if col_name_new != col_name:
+            self.df.index.name = col_name_new
+            logging.warning("Column '{}' renamed to '{}'"
+                            .format(col_name, col_name_new))
+        # then other column names
+        for col_name in self.df.columns:
+            col_name_new = regex.sub("_", col_name)
+            if col_name_new != col_name:
+                self.df.rename(columns={col_name: col_name_new}, inplace=True)
+                logging.warning("Column '{}' renamed to '{}'"
+                                .format(col_name, col_name_new))
+        # print all columns names
+        logging.debug("Index name {}'".format(self.df.index.name))
+        for name in self.df.columns:
+            logging.debug("Column name '{}'".format(name))
+
+
+    def check_data_numeric(self, col):
+        """
+        Verify that column is realy numeric
+        """
+        try:
+            self.df[col].astype('float64')
+            logging.info("Column '{}'\n".format(col)
+                         +self.df[col].describe(percentiles=[]).to_string())
+        except:
+            msg  = "Cannot cast column '{}' to float\n".format(col)
+            msg += "Check your input file!"
+            logging.error(msg)
+            raise CastFloat64(msg)
+
+
+    def check_data_type(self):
+        """
+        check data type
+        """
+        logging.info("Checking data format")
+        if self.data_type in ['real_scalar', 'real_location']:
+            for col in self.df.columns:
+                self.check_data_numeric(col)
