@@ -456,7 +456,7 @@ class Dataset():
 
     def check_data_numeric(self, col):
         """
-        Verify that column is realy numeric
+        Verify that column is really numeric
         """
         try:
             self.df[col].astype('float64')
@@ -465,7 +465,6 @@ class Dataset():
         except:
             msg  = "Cannot cast column '{}' to float\n".format(col)
             msg += "Check your input file!"
-            logging.error(msg)
             raise CastFloat64(msg)
 
 
