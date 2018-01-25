@@ -1,12 +1,12 @@
-import os   
+import os
 import random
 import subprocess
 import re
 import logging
 import numpy as np
-import pandas as pd 
+import pandas as pd
 
-import utilities
+#import utilities
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -124,7 +124,7 @@ class Process():
         logging.info("Checking data format")
         if dataset.data_type in ['scalar', 'linear']:
             for col in dataset.df.columns:
-                self.check_data_numeric(dataset, col)    
+                self.check_data_numeric(dataset, col)
 
 
     @handle_error
@@ -186,7 +186,7 @@ class Process():
         self.df.to_csv("clust.db2", header=False, sep="\t", na_rep=self.missing_encoding)
         logging.debug("Writing .tsv file [for later use]")
         self.df.to_csv("clust.tsv", header=True, sep="\t", na_rep="")
-    
+
 
     @handle_error
     def create_hd2_file(self):
@@ -263,19 +263,19 @@ class Process():
             # default value: max_duration = 0
             # max_duration set to 3600 sec. (1 hour)
             sparams.write('max_duration = 3600 \n')
-            
+
             # max_n_tries
             # max number of trials
             # doc in search-c.text, lines 403-404
             # default value: max_n_tries = 200
             sparams.write('max_n_tries = 1000 \n')
-            
+
             # max_cycles
             # max number of cycles per trial
             # doc in search-c.text, lines 316-317
             # default value: max_cyles = 200
             sparams.write('max_cycles = 1000 \n')
-            
+
             # start_j_list
             # initial guess of the number of clusters
             # doc in search-c.text, line 332
@@ -333,7 +333,7 @@ class Process():
         print(" ".join(proc.args))
         return True
 
-
+    """
     @handle_error
     def set_password(self, password_length):
         """
@@ -347,7 +347,7 @@ class Process():
         with open('access', 'w') as accessfile:
             accessfile.write(token)
         return token
-
+    """
 
     @handle_error
     def print_files(self):
@@ -415,7 +415,7 @@ class Data():
         self.df = None
         self.columns = []
         self.columns_with_missing = []
-    
+
 
     def load(self):
         """
