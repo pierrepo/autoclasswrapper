@@ -43,17 +43,22 @@ class DuplicateColumnName(Exception):
     def __init__(self, message):
         self.message = message
 
+
 class Process():
     """
     Class to handle autoclass input files and parameters
     """
 
-    def __init__(self, inputfolder='', missing_encoding="?", tolerate_error=False):
+    def __init__(self, inputfolder='',
+                        missing_encoding="?",
+                        separator="\t",
+                        tolerate_error=False):
         """
         Object instanciation
         """
         self.inputfolder = inputfolder
         self.missing_encoding = missing_encoding
+        self.separator = separator
 
         self.input_datasets = []
         self.full_dataset = Dataset()
@@ -141,35 +146,40 @@ class Process():
                      .format(self.missing_encoding))
         self.full_dataset.df.to_csv("clust.db2",
                                     header=False,
-                                    sep="\t",
+                                    sep=self.separator,
                                     na_rep=self.missing_encoding)
         logging.debug("Writing {} file [for later use]".format(tsv_name))
         self.full_dataset.df.to_csv("clust.tsv",
                                     header=True,
-                                    sep="\t",
+                                    sep=self.separator,
                                     na_rep="")
 
 
     @handle_error
     def create_hd2_file(self):
         """
-        create .hd2 file
+        Create .hd2 file
         """
         logging.info("Writing .hd2 file")
-        error_type = "rel_error"
-        error_value = self.error
+        column_names = self.full_dataset.df.columns
         with open("clust.hd2", "w") as hd2:
             hd2.write("num_db2_format_defs {}\n".format(2))
             hd2.write("\n")
             # get number of columns + index
-            hd2.write("number_of_attributes {}\n".format(self.ncols+1))
-            hd2.write("separator_char '{}'\n".format("\t"))
+            hd2.write("number_of_attributes {}\n".format(len(column_names)+1))
+            hd2.write("separator_char '{}'\n".format(self.separator))
             hd2.write("\n")
             # write first columns (protein/gene names)
-            hd2.write('0 dummy nil "{}"\n'.format(self.df.index.name))
-            for col_id in range(self.ncols):
-                hd2.write('{} real scalar "{}" zero_point {} {} {}\n'
-                          .format(col_id+1, self.df.columns[col_id], self.df.min()[col_id], error_type, error_value))
+            hd2.write('0 dummy nil "{}"\n'.format(self.full_dataset.df.index.name))
+            for idx, name in enumerate(column_names):
+                meta = self.full_dataset.column_meta[name]
+                if meta["type"] == "real_scalar":
+                    hd2.write('{} real scalar "{}" zero_point {} rel_error {}\n'
+                              .format(idx+1,
+                                      name,
+                                      self.full_dataset.df.min()[idx],
+                                      meta["error"])
+                             )
 
 
     @handle_error
@@ -456,7 +466,7 @@ class Dataset():
         """
         logging.info("Checking data format")
         for col in self.df.columns:
-            if self.column_meta[col] in ['real_scalar', 'real_location']:
+            if self.column_meta[col]['type'] in ['real_scalar', 'real_location']:
                 try:
                     self.df[col].astype('float64')
                     logging.info("Column '{}'\n".format(col)
