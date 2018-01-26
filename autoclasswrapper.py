@@ -99,9 +99,6 @@ class Process():
         self.input_datasets.append(dataset)
 
 
-
-
-
     @handle_error
     def merge_dataframes(self):
         """
@@ -135,16 +132,22 @@ class Process():
     @handle_error
     def create_db2_file(self, filename="clust"):
         """
-        create .db2 file
+        Create .db2 file
         """
         db2_name = filename + ".db2"
         tsv_name = filename + ".tsv"
         logging.info("Writing {} file".format(db2_name))
         logging.info("If any, missing values will be encoded as '{}'"
                      .format(self.missing_encoding))
-        self.df.to_csv("clust.db2", header=False, sep="\t", na_rep=self.missing_encoding)
+        self.full_dataset.df.to_csv("clust.db2",
+                                    header=False,
+                                    sep="\t",
+                                    na_rep=self.missing_encoding)
         logging.debug("Writing {} file [for later use]".format(tsv_name))
-        self.df.to_csv("clust.tsv", header=True, sep="\t", na_rep="")
+        self.full_dataset.df.to_csv("clust.tsv",
+                                    header=True,
+                                    sep="\t",
+                                    na_rep="")
 
 
     @handle_error
