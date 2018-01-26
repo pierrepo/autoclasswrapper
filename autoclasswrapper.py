@@ -10,6 +10,22 @@ import pandas as pd
 
 logging.basicConfig(level=logging.DEBUG)
 
+
+
+def raise_on_duplicates(input_list):
+    """
+    Verify if a list as duplicated values.
+
+    Raised DuplicateColumnName exception if this is the cas.
+    """
+    if len(input_list) != len(set(input_list)):
+        raise DuplicateColumnName(
+                ("Found duplicate column names:\n"
+                 "{}\n"
+                 "Please clean your header"
+                ).format(" ".join(input_list)) )
+
+
 class CastFloat64(Exception):
     """
     Exception raised when data column cannot be casted to float64
@@ -39,8 +55,8 @@ class Process():
         self.inputfolder = inputfolder
         self.missing_encoding = missing_encoding
 
-        self.datasets = []
-        self.df = None
+        self.input_datasets = []
+        self.full_dataset = Dataset()
 
         self.tolerate_error = tolerate_error
         self.had_error = False
@@ -75,69 +91,45 @@ class Process():
         """
         Add input data for clustering
         """
-        dataset = Dataset(input_file, input_type, input_error)
+        dataset = Dataset()
         logging.info("Reading data file {}".format(input_file))
-        dataset.check_duplicate_col_names()
-        dataset.read_datafile()
+        dataset.read_datafile(input_file, input_type, input_error)
         dataset.clean_column_names()
         dataset.check_data_type()
-        self.check_missing_values(input_data)
-        self.datasets.append(input_data)
+        self.input_datasets.append(dataset)
 
 
 
-
-
-
-
-
-
-
-
-    @handle_error
-    def check_missing_values(self, dataset):
-        """
-        check missing values
-        """
-        logging.info('Checking missing values')
-        columns_with_missing = dataset.df.columns[ dataset.df.isnull().any() ].tolist()
-        dataset.columns_with_missing = columns_with_missing
-        if columns_with_missing:
-            dataset.columns_with_missing = columns_with_missing
-            logging.warning('Missing values found in columns: {}'
-                            .format(" ".join(columns_with_missing)))
-        else:
-            logging.info('No missing values found')
 
 
     @handle_error
     def merge_dataframes(self):
         """
-        Merge input datasets
+        Merge input dataframes from datasets
 
         Dataframes are merged based on an 'outer' join
         https://pandas.pydata.org/pandas-docs/stable/merging.html
         - all lines are kept
         - missing data might appear
         """
-        if len(self.datasets) == 1:
-            self.df = self.datasets[0].df
+        # merge dataframes and column meta data
+        if len(self.input_datasets) == 1:
+            self.full_dataset = self.input_datasets[0]
         else:
             logging.info("Merging input data")
             df_lst = []
-            for dataset in self.datasets:
+            for dataset in self.input_datasets:
                 df_lst.append(dataset.df)
-            self.df = pd.concat(df_lst, axis=1, join="outer")
-            # check for identical column names
-            if len(set(self.df.columns)) != len(list(self.df.columns)):
-                msg  = "Found duplicate column names in merged data:\n"
-                msg += " ".join(self.df.columns)
-                raise DuplicateColumnName(msg)
-        print(len(set(self.df.columns)))
-        print(len(list(self.df.columns)))
-        nrows, ncols = self.df.shape
+                self.full_dataset.column_meta = \
+                {**self.full_dataset.column_meta, **dataset.column_meta}
+            self.full_dataset.df = pd.concat(df_lst, axis=1, join="outer")
+        # check for identical column names
+        raise_on_duplicates(self.full_dataset.df.columns)
+
+        nrows, ncols = self.full_dataset.df.shape
         logging.info("Final dataframe has {} lines and {} columns"
                      .format(nrows, ncols+1))
+        self.full_dataset.search_missing_values()
 
 
     @handle_error
@@ -367,22 +359,16 @@ class Dataset():
     """
 
 
-    def __init__(self, input_file='', data_type='', error=0.0):
+    def __init__(self):
         """
         Object instantiation
         """
-        assert data_type in ['real_scalar', 'real_location', 'discrete'], \
-               ("data_type in {} should be: "
-                "'real_scalar', 'real_location' or 'discrete'"
-                .format(input_file))
-        self.data_type = data_type
-
         # filename of input_file
-        self.input_file = input_file
-        self.error = error
+        self.input_file = ""
+        # Pandas dataframe with data
         self.df = None
-        self.columns = []
-        self.columns_with_missing = []
+        # Column meta data: data type, error, missing values
+        self.column_meta = {}
 
 
     def load(self):
@@ -395,35 +381,40 @@ class Dataset():
         self.check_missing_values()
 
 
-    def raise_on_duplicates(self, input_list):
-        """
-        Verify if a list as duplicated values
-        """
-        if len(input_list) != len(set(input_list)):
-            msg  = "Found duplicate column names:\n"
-            msg += " ".join(input_list)
-            msg += "\nPlease clean your header"
-            raise DuplicateColumnName(msg)
 
-
-    def check_duplicate_col_names(self):
+    def check_duplicate_col_names(self, input_file):
         """
         Check duplicate column clean_column_names
         """
-        with open(self.input_file) as f_in:
+        with open(input_file) as f_in:
             header = f_in.readline().strip().split("\t")
-            self.raise_on_duplicates(header)
+            raise_on_duplicates(header)
 
 
-    def read_datafile(self):
+    def read_datafile(self, input_file='', data_type='', error=0.0):
         """
         Read data file as pandas dataframe
 
         Header is on first row (header=0)
         Gene/protein/orf names are on first column (index_col=0)
         """
-        self.df = pd.read_table(self.input_file, sep='\t', header=0, index_col=0)
+        # verify data type
+        assert data_type in ['real_scalar', 'real_location', 'discrete'], \
+               ("data_type in {} should be: "
+                "'real_scalar', 'real_location' or 'discrete'"
+                .format(input_file))
+        # check for duplicate column names
+        self.input_file = input_file
+        self.check_duplicate_col_names(input_file)
+        # load data
+        self.df = pd.read_table(input_file, sep='\t', header=0, index_col=0)
         nrows, ncols = self.df.shape
+        # save column meta data (data type, error, missing values)
+        for col in self.df.columns:
+            meta = {'type': data_type,
+                    'error': error,
+                    'missing': False}
+            self.column_meta[col] = meta
         logging.info("Found {} rows and {} columns"
                      .format(nrows, ncols+1))
 
@@ -448,31 +439,40 @@ class Dataset():
                 self.df.rename(columns={col_name: col_name_new}, inplace=True)
                 logging.warning("Column '{}' renamed to '{}'"
                                 .format(col_name, col_name_new))
+                # update column meta data
+                self.column_meta[col_name_new] = self.column_meta.pop(col_name)
         # print all columns names
         logging.debug("Index name {}'".format(self.df.index.name))
         for name in self.df.columns:
             logging.debug("Column name '{}'".format(name))
 
 
-    def check_data_numeric(self, col):
-        """
-        Verify that column is really numeric
-        """
-        try:
-            self.df[col].astype('float64')
-            logging.info("Column '{}'\n".format(col)
-                         +self.df[col].describe(percentiles=[]).to_string())
-        except:
-            msg  = "Cannot cast column '{}' to float\n".format(col)
-            msg += "Check your input file!"
-            raise CastFloat64(msg)
-
-
     def check_data_type(self):
         """
-        check data type
+        Check data type
         """
         logging.info("Checking data format")
-        if self.data_type in ['real_scalar', 'real_location']:
-            for col in self.df.columns:
-                self.check_data_numeric(col)
+        for col in self.df.columns:
+            if self.column_meta[col] in ['real_scalar', 'real_location']:
+                try:
+                    self.df[col].astype('float64')
+                    logging.info("Column '{}'\n".format(col)
+                                 +self.df[col].describe(percentiles=[]).to_string())
+                except:
+                    raise CastFloat64(("Cannot cast column '{}' to float\n"
+                                       "Check your input file!").format(col)
+                                     )
+
+    def search_missing_values(self):
+        """
+        Search for missing values
+        """
+        logging.info('Searching for missing values')
+        columns_with_missing = self.df.columns[ self.df.isnull().any() ].tolist()
+        if columns_with_missing:
+            for col in columns_with_missing:
+                self.column_meta[col]['missing'] = True
+            logging.warning('Missing values found in columns: {}'
+                            .format(" ".join(columns_with_missing)))
+        else:
+            logging.info('No missing values found')
