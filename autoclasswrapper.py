@@ -173,11 +173,13 @@ class Process():
             hd2.write('0 dummy nil "{}"\n'.format(self.full_dataset.df.index.name))
             for idx, name in enumerate(column_names):
                 meta = self.full_dataset.column_meta[name]
-                if meta["type"] == "real_scalar":
-                    hd2.write('{} real scalar "{}" zero_point {} rel_error {}\n'
+                if meta["type"] == "real scalar":
+                    # by default minimum value is set to 0.0
+                    assert self.full_dataset.df.min()[idx] >= 0.0, \
+                           "min value for {} shoud be >= 0.0".format(name)
+                    hd2.write('{} real scalar "{}" zero_point 0.0 rel_error {}\n'
                               .format(idx+1,
                                       name,
-                                      self.full_dataset.df.min()[idx],
                                       meta["error"])
                              )
 
@@ -412,9 +414,9 @@ class Dataset():
         Gene/protein/orf names are on first column (index_col=0)
         """
         # verify data type
-        assert data_type in ['real_scalar', 'real_location', 'discrete'], \
-               ("data_type in {} should be: "
-                "'real_scalar', 'real_location' or 'discrete'"
+        assert data_type in ['real scalar', 'real location', 'discrete'], \
+               ("data type in {} should be: "
+                "'real scalar', 'real location' or 'discrete'"
                 .format(input_file))
         # check for duplicate column names
         self.input_file = input_file
@@ -466,7 +468,7 @@ class Dataset():
         """
         logging.info("Checking data format")
         for col in self.df.columns:
-            if self.column_meta[col]['type'] in ['real_scalar', 'real_location']:
+            if self.column_meta[col]['type'] in ['real scalar', 'real location']:
                 try:
                     self.df[col].astype('float64')
                     logging.info("Column '{}'\n".format(col)
