@@ -92,7 +92,7 @@ class Process():
 
 
     @handle_error
-    def add_input_data(self, input_file, input_type, input_error):
+    def add_input_data(self, input_file, input_type, input_error=None):
         """
         Add input data for clustering
         """
@@ -181,6 +181,12 @@ class Process():
                               .format(idx+1,
                                       name,
                                       meta["error"])
+                             )
+                if meta["type"] == "discrete":
+                    hd2.write('{} discrete nominal "{}" range {}\n'
+                              .format(idx+1,
+                                      name,
+                                      self.full_dataset.df[name].nunique())
                              )
 
 
@@ -477,6 +483,11 @@ class Dataset():
                     raise CastFloat64(("Cannot cast column '{}' to float\n"
                                        "Check your input file!").format(col)
                                      )
+            if self.column_meta[col]['type'] == "discrete":
+                logging.info("Column '{}'\n{} different values"
+                             .format(col, self.df[col].nunique())
+                             )
+
 
     def search_missing_values(self):
         """
