@@ -44,7 +44,7 @@ class DuplicateColumnName(Exception):
         self.message = message
 
 
-class Process():
+class Input():
     """
     Class to handle autoclass input files and parameters
     """
@@ -178,6 +178,12 @@ class Process():
                     assert self.full_dataset.df.min()[idx] >= 0.0, \
                            "min value for {} shoud be >= 0.0".format(name)
                     hd2.write('{} real scalar "{}" zero_point 0.0 rel_error {}\n'
+                              .format(idx+1,
+                                      name,
+                                      meta["error"])
+                             )
+                if meta["type"] == "real location":
+                    hd2.write('{} real location "{}" error {}\n'
                               .format(idx+1,
                                       name,
                                       meta["error"])
