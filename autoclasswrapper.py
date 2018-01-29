@@ -202,33 +202,40 @@ class Input():
         Create .model file
         """
         logging.info("Writing .model file")
-        real_values_normals = ""
-        real_values_missing = ""
-        multinomial_values = ""
-        for index, column in enumerate(self.columns):
-            print(column)
-            if column.type in ['scalar', 'linear']:
-                if not column.missing:
-                    real_values_normals += '{} '.format(index+1)
+        # available models:
+        real_values_normals = []
+        real_values_missing = []
+        multinomial_values  = []
+        # assign column data to models
+        for col_idx, col_name in enumerate(self.full_dataset.df.columns):
+            print(col_name)
+            meta = self.full_dataset.column_meta[col_name]
+            if meta['type'] in ['real scalar', 'real linear']:
+                if not meta['missing']:
+                    real_values_normals.append(str(col_idx+1))
                 else:
-                    real_values_missing += '{} '.format(index+1)
-            if column.type == 'discrete':
-                multinomial_values += '{} '.format(index+1)
-        # count number of different models
-        model_count = 1
+                    real_values_missing.append(str(col_idx+1))
+            if meta['type'] == 'discrete':
+                multinomial_values.append(str(col_idx+1))
+        # count number of different models used
+        # the first model is the one with labels (first column)
+        models_count = 1
         for model in [real_values_normals, real_values_missing, multinomial_values]:
             if model:
-                model_count += 1
+                models_count += 1
         # write model file
         with open("clust.model", "w") as model:
-            model.write("model_index 0 {}\n".format(model_count))
+            model.write("model_index 0 {}\n".format(models_count))
             model.write("ignore 0\n")
             if real_values_normals:
-                model.write("single_normal_cn {}\n".format(real_values_normals))
+                model.write("single_normal_cn {}\n"
+                            .format(" ".join(real_values_normals)))
             if real_values_missing:
-                model.write("single_normal_cm {}\n".format(real_values_missing))
+                model.write("single_normal_cm {}\n"
+                            .format(" ".join(real_values_missing)))
             if multinomial_values:
-                model.write("single_multinomial {}\n".format(multinomial_values))
+                model.write("single_multinomial {}\n"
+                            .format(" ".format(multinomial_values)))
 
 
     @handle_error
