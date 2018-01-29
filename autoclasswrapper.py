@@ -238,15 +238,18 @@ class Input():
 
 
     @handle_error
-    def create_sparams_file(self):
+    def create_sparams_file(self,
+                            max_duration=3600,
+                            max_n_tries=1000,
+                            max_cycles=1000):
         """
-        create  .s-params file
+        Create .s-params file
         """
         logging.info("Writing .s-params file")
         with open("clust.s-params", "w") as sparams:
-            sparams.write('screen_output_p = false \n')
-            sparams.write('break_on_warnings_p = false \n')
-            sparams.write('force_new_search_p = true \n')
+            sparams.write("screen_output_p = false \n")
+            sparams.write("break_on_warnings_p = false \n")
+            sparams.write("force_new_search_p = true \n")
 
             # max_duration
             # When > 0, specifies the maximum number of seconds to run.
@@ -254,19 +257,19 @@ class Input():
             # doc in search-c.text, lines 493-495
             # default value: max_duration = 0
             # max_duration set to 3600 sec. (1 hour)
-            sparams.write('max_duration = 3600 \n')
+            sparams.write("max_duration = {} \n".format(max_duration))
 
             # max_n_tries
             # max number of trials
             # doc in search-c.text, lines 403-404
             # default value: max_n_tries = 200
-            sparams.write('max_n_tries = 1000 \n')
+            sparams.write("max_n_tries = {} \n".format(max_n_tries))
 
             # max_cycles
             # max number of cycles per trial
             # doc in search-c.text, lines 316-317
             # default value: max_cyles = 200
-            sparams.write('max_cycles = 1000 \n')
+            sparams.write("max_cycles = {} \n".format(max_cycles))
 
             # start_j_list
             # initial guess of the number of clusters
