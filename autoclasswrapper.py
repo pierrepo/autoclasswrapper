@@ -296,11 +296,13 @@ class Input():
     def create_run_file(self):
         """
         Create .sh file
+
+        autoclass executable must be in the PATH
         """
         logging.info("Writing run file")
         with open('run_autoclass.sh', 'w') as runfile:
-            runfile.write("../autoclass -search clust.db2 clust.hd2 clust.model clust.s-params \n")
-            runfile.write("../autoclass -reports clust.results-bin clust.search clust.r-params \n")
+            runfile.write("autoclass -search clust.db2 clust.hd2 clust.model clust.s-params \n")
+            runfile.write("autoclass -reports clust.results-bin clust.search clust.r-params \n")
 
 
     @handle_error
