@@ -208,7 +208,6 @@ class Input():
         multinomial_values  = []
         # assign column data to models
         for col_idx, col_name in enumerate(self.full_dataset.df.columns):
-            print(col_name)
             meta = self.full_dataset.column_meta[col_name]
             if meta['type'] in ['real scalar', 'real linear']:
                 if not meta['missing']:
