@@ -281,15 +281,14 @@ class Input():
     @handle_error
     def create_rparams_file(self):
         """
-        create .r-params file
-
-        try those parameters:
-        report_mode = "data"
-        comment_data_headers_p = true
+        Create .r-params file
         """
         logging.info("Writing .r-params file")
         with open("clust.r-params", "w") as rparams:
             rparams.write('xref_class_report_att_list = 0, 1, 2 \n')
+            rparams.write('report_mode = "data" \n')
+            rparams.write('comment_data_headers_p = true \n')
+
 
 
     @handle_error
@@ -362,33 +361,146 @@ class Input():
                     content += "".join( param_file.readlines() )
         return content
 
+class Output():
+    """
+    Class to handle autoclass output files and results
+    """
 
-        @handle_error
-        def format_results(self):
-            """
-            Format results for end user
-            """
-            case_name = 'clust.case-data-1'
-            case_id = []
-            case_class = []
-            case_prob = []
-            with open(case_name, 'r') as case_file:
-                for line in case_file:
-                    if not line:
-                        continue
-                    if line.startswith('#') or line.startswith('DATA'):
-                        continue
-                    items = line.split()
-                    case_id.append( items[0] )
-                    case_class.append( items[1] )
-                    case_prob.append( items[2] )
-            self.df = pd.read_table(self.inputfile, sep='\t', header=0, index_col=0)
-            self.nrows, self.ncols = self.df.shape
-            if (self.nrows != len(case_class)) or (self.nrows != len(case_prob)):
-                raise('Number of rows != number of cases!')
-            self.df['cluster_class'] = case_class
-            self.df['cluster_prob'] = case_prob
-            self.df.sort(['cluster_class'], ascending=[True], inplace=True)
+    def __init__(self, inputfolder='',
+                       tolerate_error=False):
+        """
+        Object instanciation
+        """
+        self.inputfolder = inputfolder
+
+        self.tolerate_error = tolerate_error
+        self.had_error = False
+
+        self.cases = []
+        self.classes = []
+
+
+    def handle_error(f):
+        """
+        Handle error during data parsing and formating
+        """
+        def try_function(self, *args, **kwargs):
+            if self.tolerate_error or not self.had_error:
+                try:
+                    return f(self, *args, **kwargs)
+                except Exception as e:
+                    for line in str(e).split('\n'):
+                        logging.error(line)
+                    self.had_error = True
+        return try_function
+
+
+    @handle_error
+    def extract_results(self, case_name='clust.case-data-1'):
+        """
+        Extract results from autoclass
+        """
+        logging.info("Extracting autoclass results")
+        with open(case_name, 'r') as case_file:
+            for line in case_file:
+                case = {"index": None,
+                        "class1": None, "proba1": None,
+                        "class2": None, "proba2": None,
+                        "class3": None, "proba3": None}
+                if not line:
+                    continue
+                if line.startswith('#') or line.startswith('DATA'):
+                    continue
+                items = line.split()
+                assert len(items) >=0, \
+                       ("Need case#, class and prob in {}:\n "
+                        "{}\n"
+                        .format(input_file, line.rstrip()))
+                case["index"] = int(items[0])
+                case["class1"] = int(items[1])
+                case["proba1"] = float(items[2])
+                if len(items) > 3:
+                    case["class2"] = int(items[3])
+                    case["proba2"] = float(items[4])
+                if len(items) > 5:
+                    case["class2"] = int(items[5])
+                    case["proba2"] = float(items[6])
+                self.cases.append(case)
+        self.classes = list(set([case["class1"] for case in self.cases])
+                           ).sort()
+
+
+    @handle_error
+    def aggregate_input_data(self, datafile="clust.tsv"):
+        """
+        Aggregate autoclass classes with input data
+        """
+        logging.info("Aggregating input data")
+        self.df = pd.read_table(datafile, sep='\t', header=0, index_col=0)
+        nrows, ncols = self.df.shape
+        self.experiment_names = list(self.df.columns)
+        assert len(self.cases) == nrows, \
+               ("Number of cases found in results ({})"
+                "should match number of rows in input file ({})!"
+                .format(len(self.cases), datafile))
+        self.df["class1"] = [case["class1"] for case in self.cases]
+        self.df["proba1"] = [case["proba1"] for case in self.cases]
+        self.df["class2"] = [case["class2"] for case in self.cases]
+        self.df["proba2"] = [case["proba2"] for case in self.cases]
+        self.df["class3"] = [case["class3"] for case in self.cases]
+        self.df["proba3"] = [case["proba3"] for case in self.cases]
+        # cast new columns to float64
+        # usefull to convert None to Nan
+        for col in ["class1", "proba1",
+                    "class2", "proba2",
+                    "class3", "proba3"]:
+            self.df[col] = self.df[col].astype('float64')
+
+
+    @handle_error
+    def write_cdt(self):
+        """
+        Writing .cdt file for visualisation
+        """
+        logging.info("Writing .cdt file")
+        # add GWEIGHT
+        self.df["gweight"] = 1
+        # add gene name twice for formatting purpose
+        self.df["name1"] = self.df.index
+        self.df["name2"] = self.df.index
+        # build gid
+        self.df["idx"] = np.arange(1, self.df.shape[0]+1, dtype=int)
+        self.df["gid"] = self.df.apply(lambda x: "GENE{:04d}-{:03.0f}X"
+                                                 .format(x["idx"], x["class1"]),
+                                       axis=1)
+        # sort by increasing class
+        self.df.sort_values(by=['class1', 'proba1'],
+                            ascending=[True, False],
+                            inplace=True)
+        # count number of unique classes
+        class_max = self.df['class1'].nunique()
+        with open('clust.cdt', 'w') as cdtfile:
+            # write headers
+            headers = ["GID", "UNIQID", "NAME", "GWEIGHT"] \
+                    + self.experiment_names
+            cdtfile.write("{}\n".format("\t".join(headers)))
+            cdtfile.write("EWEIGHT\t\t\t"+"\t1"*len(self.experiment_names)+"\n")
+            # write classes
+            for class_idx in range(class_max):
+                cluster = self.df[self.df["class1"]==class_idx]
+                cdtfile.write(cluster.to_csv(sep="\t",
+                                             columns=["gid",
+                                                      "name1",
+                                                      "name2",
+                                                      "gweight"]
+                                                     + self.experiment_names,
+                                             index=False,
+                                             header=False,
+                                             na_rep=""))
+                # add spacer between clusters
+                for dummy in range(1, 6):
+                    cdtfile.write("GENE{:04d}-{:03.0f}S\n"
+                                  .format(dummy, class_idx))
 
 
 class Dataset():
