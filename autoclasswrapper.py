@@ -399,6 +399,20 @@ class Output():
     def extract_results(self, case_name='clust.case-data-1'):
         """
         Extract results from autoclass
+
+        TODO:
+        1. read .case-data-1 file
+            - get gene/prot indexes (n)
+            - get max number of classes (m)
+        2. build a dataframe with
+            - n rows
+            - m columns ("prob_class_x") + 1 for "class_main" + indexes
+            Fill with Nan
+        3. reread .case-data-1 file
+        Store in dataframe
+            - gene/prot index
+            - main class
+            - probs for most important classes
         """
         logging.info("Extracting autoclass results")
         with open(case_name, 'r') as case_file:
