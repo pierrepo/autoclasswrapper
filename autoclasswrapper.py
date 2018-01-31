@@ -503,6 +503,32 @@ class Output():
                                   .format(dummy, class_idx))
 
 
+    @handle_error
+    def write_cluster_stats(self):
+        """
+        Writing cluster stat file
+
+        Mean and standard deviation values per experiment
+        """
+        # count number of unique classes
+        class_max = self.df['class1'].nunique()
+        with open('clust_stat.tsv', 'w') as statfile:
+            # write headers
+            headers = ["cluster"] \
+                    + self.experiment_names
+            statfile.write("{}\n".format("\t".join(headers)))
+            # write classes
+            for class_idx in range(class_max):
+                cluster = self.df[self.df["class1"]==class_idx]
+                row_mean = ["cluster{:03.0f}mean".format(class_idx)]
+                row_std  = ["cluster{:03.0f}std".format(class_idx)]
+                for exp in self.experiment_names:
+                    row_mean.append("{:.3f}".format(cluster.mean()[exp]))
+                    row_std.append("{:.3f}".format(cluster.std()[exp]))
+                statfile.write("\t".join(row_mean)+"\n")
+                statfile.write("\t".join(row_std)+"\n")
+
+
 class Dataset():
     """
     Class to handle autoclass data files
