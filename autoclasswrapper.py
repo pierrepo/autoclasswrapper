@@ -400,27 +400,35 @@ class Output():
         """
         Extract results from autoclass
 
-        TODO:
-        1. read .case-data-1 file
-            - get gene/prot indexes (n)
-            - get max number of classes (m)
-        2. build a dataframe with
-            - n rows
-            - m columns ("prob_class_x") + 1 for "class_main" + indexes
-            Fill with Nan
-        3. reread .case-data-1 file
-        Store in dataframe
-            - gene/prot index
-            - main class
-            - probs for most important classes
         """
         logging.info("Extracting autoclass results")
+        # first pass: get number of cases and classes
+        max_class_id = 0
+        cases_number = 0
         with open(case_name, 'r') as case_file:
             for line in case_file:
-                case = {"index": None,
-                        "class1": None, "proba1": None,
-                        "class2": None, "proba2": None,
-                        "class3": None, "proba3": None}
+                if not line:
+                    continue
+                if line.startswith('#') or line.startswith('DATA'):
+                    continue
+                items = line.split()
+                if int(items[1]) > max_class_id:
+                    max_class_id = int(items[1])
+                cases_number += 1
+        logging.info("Found {} case classified in {} classes."
+                     .format(cases_number, max_class_id+1))
+        # create dataframe
+        columns = ["main-class", "main-prob"]
+        for i in range(max_class_id+1):
+            label = "prob-class-{}".format(i)
+            columns.append(label)
+        self.stats = pd.DataFrame(np.nan,
+                                  index=np.arange(1, cases_number+1),
+                                  columns=columns)
+        print(self.stats.head())
+        # second pass: fill dataframe
+        with open(case_name, 'r') as case_file:
+            for line in case_file:
                 if not line:
                     continue
                 if line.startswith('#') or line.startswith('DATA'):
@@ -430,19 +438,16 @@ class Output():
                        ("Need case#, class and prob in {}:\n "
                         "{}\n"
                         .format(input_file, line.rstrip()))
-                case["index"] = int(items[0])
-                case["class1"] = int(items[1])
-                case["proba1"] = float(items[2])
-                if len(items) > 3:
-                    case["class2"] = int(items[3])
-                    case["proba2"] = float(items[4])
-                if len(items) > 5:
-                    case["class2"] = int(items[5])
-                    case["proba2"] = float(items[6])
-                self.cases.append(case)
-        self.classes = list(set([case["class1"] for case in self.cases])
-                           ).sort()
-
+                case = int(items[0])
+                for idx in range(1, len(items), 2):
+                    class_id = int(items[idx])
+                    proba = float(items[idx+1])
+                    if idx == 1:
+                        self.stats.loc[case, "main-class"] = class_id
+                        self.stats.loc[case, "main-prob"] = proba
+                    label = "prob-class-{}".format(class_id)
+                    self.stats.loc[case, label] = proba
+        print(self.stats.head())
 
     @handle_error
     def aggregate_input_data(self, datafile="clust.tsv"):
@@ -453,22 +458,13 @@ class Output():
         self.df = pd.read_table(datafile, sep='\t', header=0, index_col=0)
         nrows, ncols = self.df.shape
         self.experiment_names = list(self.df.columns)
-        assert len(self.cases) == nrows, \
-               ("Number of cases found in results ({})"
+        assert len(self.stats.index) == nrows, \
+               ("Number of cases found in results ({}) "
                 "should match number of rows in input file ({})!"
-                .format(len(self.cases), datafile))
-        self.df["class1"] = [case["class1"] for case in self.cases]
-        self.df["proba1"] = [case["proba1"] for case in self.cases]
-        self.df["class2"] = [case["class2"] for case in self.cases]
-        self.df["proba2"] = [case["proba2"] for case in self.cases]
-        self.df["class3"] = [case["class3"] for case in self.cases]
-        self.df["proba3"] = [case["proba3"] for case in self.cases]
-        # cast new columns to float64
-        # usefull to convert None to Nan
-        for col in ["class1", "proba1",
-                    "class2", "proba2",
-                    "class3", "proba3"]:
-            self.df[col] = self.df[col].astype('float64')
+                .format(len(self.stats.index), datafile))
+        print(self.df.head())
+        self.stats.index = self.df.index
+        self.df = pd.concat([self.df, self.stats], axis=1)
 
 
     @handle_error
@@ -485,14 +481,14 @@ class Output():
         # build gid
         self.df["idx"] = np.arange(1, self.df.shape[0]+1, dtype=int)
         self.df["gid"] = self.df.apply(lambda x: "GENE{:04d}-{:03.0f}X"
-                                                 .format(x["idx"], x["class1"]),
+                                                 .format(x["idx"],
+                                                         x["main-class"]+1),
                                        axis=1)
         # sort by increasing class
-        self.df.sort_values(by=['class1', 'proba1'],
+        self.df.sort_values(by=['main-class', 'main-prob'],
                             ascending=[True, False],
                             inplace=True)
-        # count number of unique classes
-        class_max = self.df['class1'].nunique()
+        print(self.df.head())
         with open('clust.cdt', 'w') as cdtfile:
             # write headers
             headers = ["GID", "UNIQID", "NAME", "GWEIGHT"] \
@@ -500,8 +496,8 @@ class Output():
             cdtfile.write("{}\n".format("\t".join(headers)))
             cdtfile.write("EWEIGHT\t\t\t"+"\t1"*len(self.experiment_names)+"\n")
             # write classes
-            for class_idx in range(class_max):
-                cluster = self.df[self.df["class1"]==class_idx]
+            for class_idx in range(self.df['main-class'].nunique()):
+                cluster = self.df[self.df["main-class"]==class_idx]
                 cdtfile.write(cluster.to_csv(sep="\t",
                                              columns=["gid",
                                                       "name1",
@@ -525,7 +521,7 @@ class Output():
         Mean and standard deviation values per experiment
         """
         # count number of unique classes
-        class_max = self.df['class1'].nunique()
+        class_max = self.df['main-class'].nunique()
         with open('clust_stat.tsv', 'w') as statfile:
             # write headers
             headers = ["cluster"] \
@@ -533,7 +529,7 @@ class Output():
             statfile.write("{}\n".format("\t".join(headers)))
             # write classes
             for class_idx in range(class_max):
-                cluster = self.df[self.df["class1"]==class_idx]
+                cluster = self.df[self.df["main-class"]==class_idx]
                 row_mean = ["cluster{:03.0f}mean".format(class_idx)]
                 row_std  = ["cluster{:03.0f}std".format(class_idx)]
                 for exp in self.experiment_names:
