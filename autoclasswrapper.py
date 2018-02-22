@@ -416,7 +416,7 @@ class Output():
                 classes.add(int(items[1]))
                 self.case_number += 1
             self.class_number = len(classes)
-        logging.info("Found {} case classified in {} classes."
+        logging.info("Found {} cases classified in {} classes."
                      .format(self.case_number, self.class_number))
         # create dataframe
         columns = ["main-class", "main-prob"]
@@ -426,7 +426,6 @@ class Output():
         self.stats = pd.DataFrame(np.nan,
                                   index=np.arange(1, self.case_number+1),
                                   columns=columns)
-        print(self.stats.head())
         # second pass: fill dataframe
         with open(case_name, 'r') as case_file:
             for line in case_file:
@@ -448,7 +447,7 @@ class Output():
                         self.stats.loc[case, "main-prob"] = proba
                     label = "prob-class-{}".format(class_id)
                     self.stats.loc[case, label] = proba
-        print(self.stats.head())
+
 
     @handle_error
     def aggregate_input_data(self, datafile="clust.tsv"):
@@ -463,7 +462,6 @@ class Output():
                ("Number of cases found in results ({}) "
                 "should match number of rows in input file ({})!"
                 .format(len(self.stats.index), datafile))
-        print(self.df.head())
         self.stats.index = self.df.index
         self.df = pd.concat([self.df, self.stats], axis=1)
 
@@ -492,7 +490,6 @@ class Output():
         self.df.sort_values(by=['main-class', 'main-prob'],
                             ascending=[True, False],
                             inplace=True)
-        print(self.df.head())
         with open(filename, 'w') as cdtfile:
             # write header line
             headers = ["GID", "UNIQID", "NAME", "GWEIGHT"]
