@@ -471,7 +471,10 @@ class Output():
         """
         Writing .cdt file for visualisation
         """
-        logging.info("Writing .cdt file")
+        if not with_proba:
+            logging.info("Writing .cdt file")
+        else:
+            logging.info("Writing .cdt file (with probs)")
         filename = "clust.cdt"
         if with_proba:
             filename = "clust_withprobs.cdt"
