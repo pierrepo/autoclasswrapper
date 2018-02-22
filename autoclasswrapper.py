@@ -403,8 +403,9 @@ class Output():
         """
         logging.info("Extracting autoclass results")
         # first pass: get number of cases and classes
-        max_class_id = 0
-        cases_number = 0
+        self.class_number = 0
+        self.case_number = 0
+        classes = set()
         with open(case_name, 'r') as case_file:
             for line in case_file:
                 if not line:
@@ -412,18 +413,18 @@ class Output():
                 if line.startswith('#') or line.startswith('DATA'):
                     continue
                 items = line.split()
-                if int(items[1]) > max_class_id:
-                    max_class_id = int(items[1])
-                cases_number += 1
+                classes.add(int(items[1]))
+                self.case_number += 1
+            self.class_number = len(classes)
         logging.info("Found {} case classified in {} classes."
-                     .format(cases_number, max_class_id+1))
+                     .format(self.case_number, self.class_number))
         # create dataframe
         columns = ["main-class", "main-prob"]
-        for i in range(max_class_id+1):
+        for i in range(self.class_number):
             label = "prob-class-{}".format(i)
             columns.append(label)
         self.stats = pd.DataFrame(np.nan,
-                                  index=np.arange(1, cases_number+1),
+                                  index=np.arange(1, self.case_number+1),
                                   columns=columns)
         print(self.stats.head())
         # second pass: fill dataframe
@@ -468,11 +469,14 @@ class Output():
 
 
     @handle_error
-    def write_cdt(self):
+    def write_cdt(self, with_proba=False):
         """
         Writing .cdt file for visualisation
         """
         logging.info("Writing .cdt file")
+        filename = "clust.cdt"
+        if with_proba:
+            filename = "clust_withprobs.cdt"
         # add GWEIGHT
         self.df["gweight"] = 1
         # add gene name twice for formatting purpose
@@ -480,7 +484,7 @@ class Output():
         self.df["name2"] = self.df.index
         # build gid
         self.df["idx"] = np.arange(1, self.df.shape[0]+1, dtype=int)
-        self.df["gid"] = self.df.apply(lambda x: "GENE{:04d}-{:03.0f}X"
+        self.df["gid"] = self.df.apply(lambda x: "GENE{:04d}-CL{:03.0f}X"
                                                  .format(x["idx"],
                                                          x["main-class"]+1),
                                        axis=1)
@@ -489,21 +493,29 @@ class Output():
                             ascending=[True, False],
                             inplace=True)
         print(self.df.head())
-        with open('clust.cdt', 'w') as cdtfile:
-            # write headers
-            headers = ["GID", "UNIQID", "NAME", "GWEIGHT"] \
-                    + self.experiment_names
+        with open(filename, 'w') as cdtfile:
+            # write header line
+            headers = ["GID", "UNIQID", "NAME", "GWEIGHT"]
+            headers += self.experiment_names
+            if with_proba:
+                headers += ["prob-class-{}"
+                            .format(i+1) for i in range(self.class_number)]
             cdtfile.write("{}\n".format("\t".join(headers)))
-            cdtfile.write("EWEIGHT\t\t\t"+"\t1"*len(self.experiment_names)+"\n")
+            # write 'EWEIGHT' line
+            eweight = "EWEIGHT\t\t\t"+"\t1"*len(self.experiment_names)
+            if with_proba:
+                eweight += "\t1"*self.class_number
+            cdtfile.write(eweight + "\n")
             # write classes
-            for class_idx in range(self.df['main-class'].nunique()):
+            for class_idx in range(self.class_number):
                 cluster = self.df[self.df["main-class"]==class_idx]
+                col_names = ["gid", "name1", "name2", "gweight"]
+                col_names += self.experiment_names
+                if with_proba:
+                    col_names += ["prob-class-{}"
+                                  .format(i) for i in range(self.class_number)]
                 cdtfile.write(cluster.to_csv(sep="\t",
-                                             columns=["gid",
-                                                      "name1",
-                                                      "name2",
-                                                      "gweight"]
-                                                     + self.experiment_names,
+                                             columns=col_names,
                                              index=False,
                                              header=False,
                                              na_rep=""))
