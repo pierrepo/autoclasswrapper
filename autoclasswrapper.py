@@ -66,6 +66,8 @@ class Input():
         self.tolerate_error = tolerate_error
         self.had_error = False
 
+        self.change_working_dir();
+
 
     def handle_error(f):
         """
