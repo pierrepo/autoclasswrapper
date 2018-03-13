@@ -3,13 +3,15 @@ import random
 import subprocess
 import re
 import logging
+
 import numpy as np
 import pandas as pd
 
 #import utilities
 
+import logging
 logging.basicConfig(level=logging.DEBUG)
-
+log = logging.getLogger(__name__)
 
 
 def raise_on_duplicates(input_list):
@@ -66,7 +68,7 @@ class Input():
         self.tolerate_error = tolerate_error
         self.had_error = False
 
-        self.change_working_dir();
+        #self.change_working_dir()
 
 
     def handle_error(f):
@@ -79,7 +81,7 @@ class Input():
                     return f(self, *args, **kwargs)
                 except Exception as e:
                     for line in str(e).split('\n'):
-                        logging.error(line)
+                        log.error(line)
                     self.had_error = True
         return try_function
 
@@ -89,7 +91,7 @@ class Input():
         """
         change working dir
         """
-        logging.info("Changing working directory")
+        log.info("Changing working directory")
         os.chdir(self.inputfolder)
 
 
@@ -99,7 +101,7 @@ class Input():
         Add input data for clustering
         """
         dataset = Dataset()
-        logging.info("Reading data file {}".format(input_file))
+        log.info("Reading data file {}".format(input_file))
         dataset.read_datafile(input_file, input_type, input_error)
         dataset.clean_column_names()
         dataset.check_data_type()
@@ -120,18 +122,17 @@ class Input():
         if len(self.input_datasets) == 1:
             self.full_dataset = self.input_datasets[0]
         else:
-            logging.info("Merging input data")
+            log.info("Merging input data")
             df_lst = []
             for dataset in self.input_datasets:
                 df_lst.append(dataset.df)
-                self.full_dataset.column_meta = \
-                {**self.full_dataset.column_meta, **dataset.column_meta}
+                self.full_dataset.column_meta = {**self.full_dataset.column_meta, **dataset.column_meta}
             self.full_dataset.df = pd.concat(df_lst, axis=1, join="outer")
         # check for identical column names
         raise_on_duplicates(self.full_dataset.df.columns)
 
         nrows, ncols = self.full_dataset.df.shape
-        logging.info("Final dataframe has {} lines and {} columns"
+        log.info("Final dataframe has {} lines and {} columns"
                      .format(nrows, ncols+1))
         self.full_dataset.search_missing_values()
 
@@ -143,14 +144,14 @@ class Input():
         """
         db2_name = filename + ".db2"
         tsv_name = filename + ".tsv"
-        logging.info("Writing {} file".format(db2_name))
-        logging.info("If any, missing values will be encoded as '{}'"
+        log.info("Writing {} file".format(db2_name))
+        log.info("If any, missing values will be encoded as '{}'"
                      .format(self.missing_encoding))
         self.full_dataset.df.to_csv("clust.db2",
                                     header=False,
                                     sep=self.separator,
                                     na_rep=self.missing_encoding)
-        logging.debug("Writing {} file [for later use]".format(tsv_name))
+        log.debug("Writing {} file [for later use]".format(tsv_name))
         self.full_dataset.df.to_csv("clust.tsv",
                                     header=True,
                                     sep=self.separator,
@@ -162,7 +163,7 @@ class Input():
         """
         Create .hd2 file
         """
-        logging.info("Writing .hd2 file")
+        log.info("Writing .hd2 file")
         column_names = self.full_dataset.df.columns
         with open("clust.hd2", "w") as hd2:
             hd2.write("num_db2_format_defs {}\n".format(2))
@@ -203,7 +204,7 @@ class Input():
         """
         Create .model file
         """
-        logging.info("Writing .model file")
+        log.info("Writing .model file")
         # available models:
         real_values_normals = []
         real_values_missing = []
@@ -247,7 +248,7 @@ class Input():
         """
         Create .s-params file
         """
-        logging.info("Writing .s-params file")
+        log.info("Writing .s-params file")
         with open("clust.s-params", "w") as sparams:
             sparams.write("screen_output_p = false \n")
             sparams.write("break_on_warnings_p = false \n")
@@ -285,7 +286,7 @@ class Input():
         """
         Create .r-params file
         """
-        logging.info("Writing .r-params file")
+        log.info("Writing .r-params file")
         with open("clust.r-params", "w") as rparams:
             rparams.write('xref_class_report_att_list = 0, 1, 2 \n')
             rparams.write('report_mode = "data" \n')
@@ -300,7 +301,7 @@ class Input():
 
         autoclass executable must be in the PATH
         """
-        logging.info("Writing run file")
+        log.info("Writing run file")
         with open('run_autoclass.sh', 'w') as runfile:
             runfile.write("autoclass -search clust.db2 clust.hd2 clust.model clust.s-params \n")
             runfile.write("autoclass -reports clust.results-bin clust.search clust.r-params \n")
@@ -311,7 +312,7 @@ class Input():
         """
         Prepare input and parameters files
         """
-        logging.info("Preparing data and parameters files")
+        log.info("Preparing data and parameters files")
         self.change_working_dir()
         self.create_db2_file()
         self.create_hd2_file()
@@ -326,26 +327,11 @@ class Input():
         """
         Run autoclass
         """
-        logging.info("Running clustering...")
+        log.info("Running clustering...")
         proc = subprocess.Popen(['bash', 'run_autoclass.sh', self.inputfolder])
         print(" ".join(proc.args))
         return True
 
-    '''
-    @handle_error
-    def set_password(self, password_length):
-        """
-        Output access token for user
-
-        Token is 8 characters long and always start with the 'T' letter
-        """
-        logging.info("{} / writing access file".format(self.inputfolder))
-        token = utilities.create_random_string(password_length-1)
-        token = 'P' + token
-        with open('access', 'w') as accessfile:
-            accessfile.write(token)
-        return token
-    '''
 
     @handle_error
     def print_files(self):
@@ -392,7 +378,7 @@ class Output():
                     return f(self, *args, **kwargs)
                 except Exception as e:
                     for line in str(e).split('\n'):
-                        logging.error(line)
+                        log.error(line)
                     self.had_error = True
         return try_function
 
@@ -403,7 +389,7 @@ class Output():
         Extract results from autoclass
 
         """
-        logging.info("Extracting autoclass results")
+        log.info("Extracting autoclass results")
         # first pass: get number of cases and classes
         self.class_number = 0
         self.case_number = 0
@@ -418,7 +404,7 @@ class Output():
                 classes.add(int(items[1]))
                 self.case_number += 1
             self.class_number = len(classes)
-        logging.info("Found {} cases classified in {} classes."
+        log.info("Found {} cases classified in {} classes."
                      .format(self.case_number, self.class_number))
         # create dataframe
         columns = ["main-class", "main-prob"]
@@ -456,7 +442,7 @@ class Output():
         """
         Aggregate autoclass classes with input data
         """
-        logging.info("Aggregating input data")
+        log.info("Aggregating input data")
         self.df = pd.read_table(datafile, sep='\t', header=0, index_col=0)
         nrows, ncols = self.df.shape
         self.experiment_names = list(self.df.columns)
@@ -474,9 +460,9 @@ class Output():
         Writing .cdt file for visualisation
         """
         if not with_proba:
-            logging.info("Writing .cdt file")
+            log.info("Writing .cdt file")
         else:
-            logging.info("Writing .cdt file (with probs)")
+            log.info("Writing .cdt file (with probs)")
         filename = "clust.cdt"
         if with_proba:
             filename = "clust_withprobs.cdt"
@@ -615,7 +601,7 @@ class Dataset():
                     'error': error,
                     'missing': False}
             self.column_meta[col] = meta
-        logging.info("Found {} rows and {} columns"
+        log.info("Found {} rows and {} columns"
                      .format(nrows, ncols+1))
 
 
@@ -624,46 +610,46 @@ class Dataset():
         Cleanup column names
         """
         regex = re.compile('[^A-Za-z0-9 .-]+')
-        logging.debug("Checking column names")
+        log.debug("Checking column names")
         # check index column name first
         col_name = self.df.index.name
         col_name_new = regex.sub("_", col_name)
         if col_name_new != col_name:
             self.df.index.name = col_name_new
-            logging.warning("Column '{}' renamed to '{}'"
+            log.warning("Column '{}' renamed to '{}'"
                             .format(col_name, col_name_new))
         # then other column names
         for col_name in self.df.columns:
             col_name_new = regex.sub("_", col_name)
             if col_name_new != col_name:
                 self.df.rename(columns={col_name: col_name_new}, inplace=True)
-                logging.warning("Column '{}' renamed to '{}'"
+                log.warning("Column '{}' renamed to '{}'"
                                 .format(col_name, col_name_new))
                 # update column meta data
                 self.column_meta[col_name_new] = self.column_meta.pop(col_name)
         # print all columns names
-        logging.debug("Index name {}'".format(self.df.index.name))
+        log.debug("Index name {}'".format(self.df.index.name))
         for name in self.df.columns:
-            logging.debug("Column name '{}'".format(name))
+            log.debug("Column name '{}'".format(name))
 
 
     def check_data_type(self):
         """
         Check data type
         """
-        logging.info("Checking data format")
+        log.info("Checking data format")
         for col in self.df.columns:
             if self.column_meta[col]['type'] in ['real scalar', 'real location']:
                 try:
                     self.df[col].astype('float64')
-                    logging.info("Column '{}'\n".format(col)
+                    log.info("Column '{}'\n".format(col)
                                  +self.df[col].describe(percentiles=[]).to_string())
                 except:
                     raise CastFloat64(("Cannot cast column '{}' to float\n"
                                        "Check your input file!").format(col)
                                      )
             if self.column_meta[col]['type'] == "discrete":
-                logging.info("Column '{}'\n{} different values"
+                log.info("Column '{}'\n{} different values"
                              .format(col, self.df[col].nunique())
                              )
 
@@ -672,12 +658,12 @@ class Dataset():
         """
         Search for missing values
         """
-        logging.info('Searching for missing values')
+        log.info('Searching for missing values')
         columns_with_missing = self.df.columns[ self.df.isnull().any() ].tolist()
         if columns_with_missing:
             for col in columns_with_missing:
                 self.column_meta[col]['missing'] = True
-            logging.warning('Missing values found in columns: {}'
+            log.warning('Missing values found in columns: {}'
                             .format(" ".join(columns_with_missing)))
         else:
-            logging.info('No missing values found')
+            log.info('No missing values found')
