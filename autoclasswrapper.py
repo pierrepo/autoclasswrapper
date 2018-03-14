@@ -3,6 +3,8 @@ import random
 import subprocess
 import re
 import logging
+import zipfile
+import datetime
 
 import numpy as np
 import pandas as pd
@@ -559,6 +561,19 @@ class Output():
                 statfile.write("\t".join(row_mean)+"\n")
                 statfile.write("\t".join(row_std)+"\n")
 
+
+    @handle_error
+    def wrap_outputs(self):
+        """
+        Wrap results into a ziped file
+        """
+        t = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        zipname = "{}-clust.zip".format(t)
+        with zipfile.ZipFile(zipname, "w") as outputzip:
+            outputzip.write("clust.cdt")
+            outputzip.write("clust_withprobs.cdt")
+            outputzip.write("clust_stat.tsv")
+        return zipname
 
 class Dataset():
     """
