@@ -101,7 +101,15 @@ class Input():
         Add input data for clustering
         """
         dataset = Dataset()
-        log.info("Reading data file {}".format(input_file))
+        # verify data type
+        assert input_type in ['real scalar', 'real location', 'discrete'], \
+               ("data type in {} should be: "
+                "'real scalar', 'real location' or 'discrete'"
+                .format(input_file))
+        msg = "Reading data file '{}' as '{}'".format(input_file, input_type)
+        if input_type in ['real scalar', 'real location']:
+            msg += " with error {}".format(input_error)
+        log.info(msg)
         dataset.read_datafile(input_file, input_type, input_error)
         dataset.clean_column_names()
         dataset.check_data_type()
@@ -293,7 +301,6 @@ class Input():
             rparams.write('comment_data_headers_p = true \n')
 
 
-
     @handle_error
     def create_run_file(self):
         """
@@ -305,6 +312,21 @@ class Input():
         with open('run_autoclass.sh', 'w') as runfile:
             runfile.write("autoclass -search clust.db2 clust.hd2 clust.model clust.s-params \n")
             runfile.write("autoclass -reports clust.results-bin clust.search clust.r-params \n")
+
+
+    @handle_error
+    def create_run_file_test(self):
+        """
+        Create .sh file
+        """
+        log.info("Writing run file")
+        with open('run_autoclass.sh', 'w') as runfile:
+            runfile.write("for a in $(seq 1 60) \n")
+            runfile.write("do \n")
+            runfile.write("sleep 1 \n")
+            runfile.write("touch clust.log \n")
+            runfile.write("done \n")
+            runfile.write("touch clust.rlog \n")
 
 
     @handle_error
@@ -323,13 +345,12 @@ class Input():
 
 
     @handle_error
-    def run(self):
+    def run(self, tag=""):
         """
         Run autoclass
         """
         log.info("Running clustering...")
-        proc = subprocess.Popen(['bash', 'run_autoclass.sh', self.inputfolder])
-        print(" ".join(proc.args))
+        proc = subprocess.Popen(['bash', 'run_autoclass.sh', tag])
         return True
 
 
