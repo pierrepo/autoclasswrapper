@@ -8,13 +8,19 @@ import datetime
 
 import numpy as np
 import pandas as pd
+import chardet
 
 #import utilities
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
-
+log_h = logging.StreamHandler()
+log_f = logging.Formatter('%(asctime)s :: %(levelname)-8s :: %(message)s',
+                          "%Y-%m-%d %H:%M")
+log_h.setFormatter(log_f)
+log.addHandler(log_h)
+log.setLevel(logging.DEBUG)
 
 def raise_on_duplicates(input_list):
     """
@@ -613,7 +619,7 @@ class Dataset():
             raise_on_duplicates(header)
 
 
-    def read_datafile(self, input_file='', data_type='', error=0.0):
+    def read_datafile(self, input_file='', data_type='', error=None):
         """
         Read data file as pandas dataframe
 
@@ -628,8 +634,15 @@ class Dataset():
         # check for duplicate column names
         self.input_file = input_file
         self.check_duplicate_col_names(input_file)
+        # guess encoding
+        with open(input_file, 'rb') as f:
+            enc_result = chardet.detect(f.read())
+        log.info("Detected encoding: {}".format(enc_result['encoding']))
         # load data
-        self.df = pd.read_table(input_file, sep='\t', header=0, index_col=0)
+        self.df = pd.read_table(input_file, sep='\t',
+                                            header=0,
+                                            index_col=0,
+                                            encoding=enc_result['encoding'])
         nrows, ncols = self.df.shape
         # save column meta data (data type, error, missing values)
         for col in self.df.columns:
