@@ -376,6 +376,7 @@ class Input():
                     content += "".join( param_file.readlines() )
         return content
 
+
 class Output():
     """
     Class to handle autoclass output files and results
@@ -579,6 +580,7 @@ class Output():
             outputzip.write("clust_stat.tsv")
         return zipname
 
+
 class Dataset():
     """
     Class to handle autoclass data files
@@ -656,7 +658,7 @@ class Dataset():
         """
         Cleanup column names
         """
-        regex = re.compile('[^A-Za-z0-9 .-]+')
+        regex = re.compile('[^A-Za-z0-9 .+-]+')
         log.debug("Checking column names")
         # check index column name first
         col_name = self.df.index.name
