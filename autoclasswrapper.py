@@ -10,10 +10,8 @@ import numpy as np
 import pandas as pd
 import chardet
 
-#import utilities
 
 import logging
-#logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
 log_h = logging.StreamHandler()
 log_f = logging.Formatter('%(asctime)s :: %(levelname)-8s :: %(message)s',
