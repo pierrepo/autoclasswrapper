@@ -19,11 +19,12 @@ def raise_on_duplicates(input_list):
     Raised DuplicateColumnName exception if this is the cas.
     """
     if len(input_list) != len(set(input_list)):
+        col_names = ["'{}'".format(name) for name in input_list]
         raise DuplicateColumnName(
                 ("Found duplicate column names:\n"
                  "{}\n"
                  "Please clean your header"
-                ).format(" ".join(input_list)) )
+                ).format(" ".join(col_names)) )
 
 
 class CastFloat64(Exception):
