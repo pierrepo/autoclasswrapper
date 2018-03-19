@@ -226,7 +226,7 @@ class Input():
         # assign column data to models
         for col_idx, col_name in enumerate(self.full_dataset.df.columns):
             meta = self.full_dataset.column_meta[col_name]
-            if meta['type'] in ['real scalar', 'real linear']:
+            if meta['type'] in ['real scalar', 'real location']:
                 if not meta['missing']:
                     real_values_normals.append(str(col_idx+1))
                 else:
