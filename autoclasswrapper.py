@@ -257,7 +257,7 @@ class Input():
     @handle_error
     def create_sparams_file(self,
                             max_duration=3600,
-                            max_n_tries=1000,
+                            max_n_tries=200,
                             max_cycles=1000):
         """
         Create .s-params file
