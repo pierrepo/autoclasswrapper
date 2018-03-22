@@ -16,11 +16,11 @@ def raise_on_duplicates(input_list):
     """
     Verify if a list as duplicated values.
 
-    Raised DuplicateColumnName exception if this is the cas.
+    Raised DuplicateColumnNameError exception if this is the cas.
     """
     if len(input_list) != len(set(input_list)):
         col_names = ["'{}'".format(name) for name in input_list]
-        raise DuplicateColumnName(
+        raise DuplicateColumnNameError(
                 ("Found duplicate column names:\n"
                  "{}\n"
                  "Please clean your header"
@@ -36,7 +36,7 @@ class CastFloat64(Exception):
         self.message = message
 
 
-class DuplicateColumnName(Exception):
+class DuplicateColumnNameError(Exception):
     """
     Exception raised when column names are identical
     """
@@ -100,16 +100,10 @@ class Input():
         Add input data for clustering
         """
         dataset = Dataset()
-        # verify data type
-        assert input_type in ['real scalar', 'real location', 'discrete'], \
-               ("data type in {} should be: "
-                "'real scalar', 'real location' or 'discrete'"
-                .format(input_file))
-        msg = "Reading data file '{}' as '{}'".format(input_file, input_type)
-        if input_type in ['real scalar', 'real location']:
-            msg += " with error {}".format(input_error)
-        log.info(msg)
-        dataset.read_datafile(input_file, input_type, input_error)
+        dataset.read_datafile(input_file,
+                              self.separator,
+                              input_type,
+                              input_error)
         dataset.clean_column_names()
         dataset.check_data_type()
         self.input_datasets.append(dataset)
@@ -370,6 +364,7 @@ class Input():
         return content
 
 
+
 class Dataset():
     """
     Class to handle autoclass data files
@@ -382,33 +377,36 @@ class Dataset():
         """
         # filename of input_file
         self.input_file = ""
+        # field separator
+        self.separator = "\t"
         # Pandas dataframe with data
         self.df = None
         # Column meta data: data type, error, missing values
         self.column_meta = {}
 
 
-    def load(self):
-        """
-        Load data
-        """
-        self.read_datafile()
-        self.clean_column_names()
-        self.check_data_type()
-        self.check_missing_values()
-
-
-
-    def check_duplicate_col_names(self, input_file):
+    def check_duplicate_col_names(self):
         """
         Check duplicate column clean_column_names
         """
-        with open(input_file) as f_in:
+        with open(self.input_file) as f_in:
             header = f_in.readline().strip().split("\t")
             raise_on_duplicates(header)
 
 
-    def read_datafile(self, input_file='', data_type='', error=None):
+    def guess_encoding(self):
+        """
+        Guess input file encoding
+        """
+        with open(self.input_file, 'rb') as f:
+            enc_result = chardet.detect(f.read())
+            return enc_result['encoding']
+
+    def read_datafile(self,
+                      input_file='',
+                      separator="\t",
+                      data_type='',
+                      error=None):
         """
         Read data file as pandas dataframe
 
@@ -417,21 +415,25 @@ class Dataset():
         """
         # verify data type
         assert data_type in ['real scalar', 'real location', 'discrete'], \
-               ("data type in {} should be: "
-                "'real scalar', 'real location' or 'discrete'"
-                .format(input_file))
+            ("data type in {} should be: "
+             "'real scalar', 'real location' or 'discrete'"
+             .format(input_file))
+        msg = "Reading data file '{}' as '{}'".format(input_file, data_type)
+        if data_type in ['real scalar', 'real location']:
+            msg += " with error {}".format(error)
+        log.info(msg)
         # check for duplicate column names
         self.input_file = input_file
-        self.check_duplicate_col_names(input_file)
-        # guess encoding
-        with open(input_file, 'rb') as f:
-            enc_result = chardet.detect(f.read())
-        log.info("Detected encoding: {}".format(enc_result['encoding']))
+        self.check_duplicate_col_names()
+        # find encoding
+        encoding = self.guess_encoding()
+        log.info("Detected encoding: {}".format(encoding))
         # load data
-        self.df = pd.read_table(input_file, sep='\t',
-                                            header=0,
-                                            index_col=0,
-                                            encoding=enc_result['encoding'])
+        self.df = pd.read_table(input_file,
+                                sep=separator,
+                                header=0,
+                                index_col=0,
+                                encoding=encoding)
         nrows, ncols = self.df.shape
         # save column meta data (data type, error, missing values)
         for col in self.df.columns:
@@ -439,8 +441,7 @@ class Dataset():
                     'error': error,
                     'missing': False}
             self.column_meta[col] = meta
-        log.info("Found {} rows and {} columns"
-                     .format(nrows, ncols+1))
+        log.info("Found {} rows and {} columns".format(nrows, ncols+1))
 
 
     def clean_column_names(self):
