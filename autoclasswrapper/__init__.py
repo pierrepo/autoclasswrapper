@@ -7,5 +7,5 @@ log_h.setFormatter(log_f)
 log.addHandler(log_h)
 log.setLevel(logging.DEBUG)
 
-from .wrap_in import Input
-from .wrap_out import Output
+from .input import Input, Dataset, DuplicateColumnNameError
+from .output import Output
