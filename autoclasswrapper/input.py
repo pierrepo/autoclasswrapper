@@ -82,7 +82,7 @@ class Input():
     """
 
     def __init__(self,
-                 root_name='clust',
+                 root_name="clust",
                  db2_separator_char="\t",
                  db2_missing_char="?",
                  tolerate_error=False):
@@ -484,6 +484,7 @@ class Dataset():
         self.data_type = data_type
         self.error = error
         self.separator_char = separator_char
+        self.missing_char = missing_char
         self.df = None
         self.column_meta = {}
         # verify data type
