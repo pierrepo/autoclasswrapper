@@ -10,13 +10,23 @@ import pandas as pd
 import chardet
 
 import logging
+# logging.basicConfig(format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+#     datefmt='%Y-%m-%d %H:%M:%S',
+#     level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 def raise_on_duplicates(input_list):
-    """
-    Verify if a list as duplicated values.
+    """Verify if a list as duplicated values
 
-    Raised DuplicateColumnNameError exception if this is the cas.
+    Parameters
+    ----------
+    input_list : list of strings
+        List of column names.
+
+    Raises
+    ----------
+    DuplicateColumnNameError : exception
+        If there is a duplicated element in the input list.
     """
     if len(input_list) != len(set(input_list)):
         col_names = ["'{}'".format(name) for name in input_list]
@@ -27,18 +37,16 @@ def raise_on_duplicates(input_list):
                 ).format(" ".join(col_names)) )
 
 
-class CastFloat64(Exception):
-    """
-    Exception raised when data column cannot be casted to float64
+class DuplicateColumnNameError(Exception):
+    """Exception raised when column names are identical
     """
 
     def __init__(self, message):
         self.message = message
 
 
-class DuplicateColumnNameError(Exception):
-    """
-    Exception raised when column names are identical
+class CastFloat64(Exception):
+    """Exception raised when data column cannot be casted to float64 type
     """
 
     def __init__(self, message):
@@ -46,33 +54,61 @@ class DuplicateColumnNameError(Exception):
 
 
 class Input():
+    """Autoclass input files and parameters
+
+    Parameters
+    ----------
+    root_name : string (default "clust")
+        Root name to generate input files for autoclass.
+        Example: "clust" will lead to "clust.db2", "clust.model"...
+    db2_separator_char : string (default: "\t")
+        Character used to separate columns of data in autoclass db2 file.
+    db2_missing_char : string (default: "?")
+        Character used to encode missing data in autoclass db2 file.
+    tolerate_error : bool (default: False)
+        If True, countinue generation of autoclass input files even if an
+        error is encounter.
+        If False, stop at first error.
+
+    Attributes
+    ----------
+    had_error : bool (defaut False)
+        Set to True if an error has been found in the generation of autoclass
+        input files.
+    input_datasets : list of Dataset() objects
+        List of all input Datasets.
+    full_dataset : Dataset() object
+        Final Dataset used by autoclass.
     """
-    Class to handle autoclass input files and parameters
-    """
 
-    def __init__(self, inputfolder='',
-                        missing_encoding="?",
-                        separator="\t",
-                        tolerate_error=False):
+    def __init__(self,
+                 root_name='clust',
+                 db2_separator_char="\t",
+                 db2_missing_char="?",
+                 tolerate_error=False):
+        """Object instanciation
         """
-        Object instanciation
-        """
-        self.inputfolder = inputfolder
-        self.missing_encoding = missing_encoding
-        self.separator = separator
-
-        self.input_datasets = []
-        self.full_dataset = Dataset()
-
+        self.root_name = root_name
+        self.db2_separator_char = db2_separator_char
+        self.db2_missing_char = db2_missing_char
         self.tolerate_error = tolerate_error
         self.had_error = False
-
-        #self.change_working_dir()
+        self.input_datasets = []
+        self.full_dataset = Dataset("", "merged")
 
 
     def handle_error(f):
-        """
-        Handle error during data parsing and formating
+        """Handle error during data parsing and formating
+
+        Function decorator.
+
+        Parameters
+        ----------
+        f : function
+
+        Returns
+        -------
+        try_function : function wrapped into error handler
         """
         def try_function(self, *args, **kwargs):
             if self.tolerate_error or not self.had_error:
@@ -85,25 +121,44 @@ class Input():
         return try_function
 
 
-    @handle_error
-    def change_working_dir(self):
-        """
-        change working dir
-        """
-        log.info("Changing working directory")
-        os.chdir(self.inputfolder)
+    # @handle_error
+    # def change_working_dir(self):
+    #     """
+    #     change working dir
+    #     """
+    #     log.info("Changing working directory")
+    #     os.chdir(self.inputfolder)
 
 
     @handle_error
-    def add_input_data(self, input_file, input_type, input_error=None):
+    def add_input_data(self,
+                       input_file,
+                       input_type,
+                       input_error=None,
+                       input_separator_char="\t",
+                       input_missing_char=""):
+        """Read input data file and append to list of datasets
+
+        Parameters
+        ----------
+        input_file : string
+            Name of the data file to read.
+        input_type : string
+            Type of data contained in input file.
+            Either "real scalar", "real location" or "discrete"
+        input_error : float (default: None)
+            Input error value.
+        input_separator_char : string (default: "\t")
+            Character used to separate columns of data in input file.
+        input_missing_char : string (default: "")
+            Character used to encode missing data in input file.
         """
-        Add input data for clustering
-        """
-        dataset = Dataset()
-        dataset.read_datafile(input_file,
-                              self.separator,
-                              input_type,
-                              input_error)
+        dataset = Dataset(input_file,
+                          input_type,
+                          input_error,
+                          input_separator_char,
+                          input_missing_char)
+        dataset.read_datafile()
         dataset.clean_column_names()
         dataset.check_data_type()
         self.input_datasets.append(dataset)
@@ -111,15 +166,15 @@ class Input():
 
     @handle_error
     def merge_dataframes(self):
-        """
-        Merge input dataframes from datasets
+        """Merge input dataframes from datasets
 
+        Notes
+        -----
         Dataframes are merged based on an 'outer' join
         https://pandas.pydata.org/pandas-docs/stable/merging.html
         - all lines are kept
         - missing data might appear
         """
-        # merge dataframes and column meta data
         if len(self.input_datasets) == 1:
             self.full_dataset = self.input_datasets[0]
         else:
@@ -127,54 +182,59 @@ class Input():
             df_lst = []
             for dataset in self.input_datasets:
                 df_lst.append(dataset.df)
-                self.full_dataset.column_meta = {**self.full_dataset.column_meta, **dataset.column_meta}
+                # 'merge' column meta data
+                self.full_dataset.column_meta ={**self.full_dataset.column_meta,
+                                                **dataset.column_meta}
+            # merge dataframes
             self.full_dataset.df = pd.concat(df_lst, axis=1, join="outer")
         # check for identical column names
         raise_on_duplicates(self.full_dataset.df.columns)
 
         nrows, ncols = self.full_dataset.df.shape
         log.info("Final dataframe has {} lines and {} columns"
-                     .format(nrows, ncols+1))
+                 .format(nrows, ncols+1))
         self.full_dataset.search_missing_values()
 
 
     @handle_error
-    def create_db2_file(self, filename="clust"):
+    def create_db2_file(self):
+        """Create .db2 file (data)
+
+        Also save all data into a .tsv file for later user.
         """
-        Create .db2 file
-        """
-        db2_name = filename + ".db2"
-        tsv_name = filename + ".tsv"
+        db2_name = self.root_name + ".db2"
+        tsv_name = self.root_name + ".tsv"
         log.info("Writing {} file".format(db2_name))
         log.info("If any, missing values will be encoded as '{}'"
-                     .format(self.missing_encoding))
+                 .format(self.db2_missing_char))
         self.full_dataset.df.to_csv("clust.db2",
                                     header=False,
-                                    sep=self.separator,
-                                    na_rep=self.missing_encoding)
+                                    sep=self.db2_separator_char,
+                                    na_rep=self.db2_missing_char)
         log.debug("Writing {} file [for later use]".format(tsv_name))
         self.full_dataset.df.to_csv("clust.tsv",
                                     header=True,
-                                    sep=self.separator,
+                                    sep="\t",
                                     na_rep="")
 
 
     @handle_error
     def create_hd2_file(self):
-        """
-        Create .hd2 file
+        """Create .hd2 file (Autoclass data descriptions)
         """
         log.info("Writing .hd2 file")
+        hd2_name = self.root_name + ".hd2"
         column_names = self.full_dataset.df.columns
-        with open("clust.hd2", "w") as hd2:
+        with open(hd2_name, "w") as hd2:
             hd2.write("num_db2_format_defs {}\n".format(2))
             hd2.write("\n")
             # get number of columns + index
             hd2.write("number_of_attributes {}\n".format(len(column_names)+1))
-            hd2.write("separator_char '{}'\n".format(self.separator))
+            hd2.write("separator_char '{}'\n".format(self.db2_separator_char))
             hd2.write("\n")
             # write first columns (protein/gene names)
-            hd2.write('0 dummy nil "{}"\n'.format(self.full_dataset.df.index.name))
+            hd2.write('0 dummy nil "{}"\n'
+                      .format(self.full_dataset.df.index.name))
             for idx, name in enumerate(column_names):
                 meta = self.full_dataset.column_meta[name]
                 if meta["type"] == "real scalar":
@@ -202,10 +262,12 @@ class Input():
 
     @handle_error
     def create_model_file(self):
-        """
-        Create .model file
+        """Create .model file (Autoclass data models)
+
+        Choice of model based on data type and missing values
         """
         log.info("Writing .model file")
+        model_name = self.root_name + ".model"
         # available models:
         real_values_normals = []
         real_values_missing = []
@@ -223,11 +285,13 @@ class Input():
         # count number of different models used
         # the first model is the one with labels (first column)
         models_count = 1
-        for model in [real_values_normals, real_values_missing, multinomial_values]:
+        for model in [real_values_normals,
+                      real_values_missing,
+                      multinomial_values]:
             if model:
                 models_count += 1
         # write model file
-        with open("clust.model", "w") as model:
+        with open(model_name, "w") as model:
             model.write("model_index 0 {}\n".format(models_count))
             model.write("ignore 0\n")
             if real_values_normals:
@@ -245,50 +309,55 @@ class Input():
     def create_sparams_file(self,
                             max_duration=3600,
                             max_n_tries=200,
-                            max_cycles=1000):
-        """
-        Create .s-params file
+                            max_cycles=1000,
+                            start_j_list=[2, 3, 5, 7, 10, 15, 25, 35,
+                                          45, 55, 65, 75, 85, 95, 105]):
+        """Create .s-params file (Autoclass search parameters)
+
+        Parameters
+        ----------
+        max_duration : int (default: 3600)
+            Maximum time (in seconds) for the autoclass simulation.
+            If set max_duration = 0, simulation will run with NO time limit
+            For more details, see autoclass documentation:
+            file search-c.text, lines 493-495
+        max_n_tries : int (default: 200)
+            Number of trials to run.
+            For more details, see autoclass documentation:
+            file search-c.text, lines 403-404
+        max_cycles : int (default: 1000)
+            Max number of cycles per trial.
+            This is maximum that may not be reached.
+            For more details, see autoclass documentation:
+            file search-c.text, lines 316-317
+        start_j_list : list of int (default: [2, 3, 5, 7, 10, 15, 25, 35,
+                                             45, 55, 65, 75, 85, 95, 105])
+            Initial guesses of the number of clusters
+            Autoclass default: 2, 3, 5, 7, 10, 15, 25
+            For more details, see autoclass documentation:
+            file search-c.text, line 332
+
         """
         log.info("Writing .s-params file")
+        sparams_name = self.root_name + ".s-params"
         with open("clust.s-params", "w") as sparams:
             sparams.write("screen_output_p = false \n")
             sparams.write("break_on_warnings_p = false \n")
             sparams.write("force_new_search_p = true \n")
-
-            # max_duration
-            # When > 0, specifies the maximum number of seconds to run.
-            # When = 0, allows run to continue until otherwise halted.
-            # doc in search-c.text, lines 493-495
-            # default value: max_duration = 0
-            # max_duration set to 3600 sec. (1 hour)
-            sparams.write("max_duration = {} \n".format(max_duration))
-
-            # max_n_tries
-            # max number of trials
-            # doc in search-c.text, lines 403-404
-            # default value: max_n_tries = 200
-            sparams.write("max_n_tries = {} \n".format(max_n_tries))
-
-            # max_cycles
-            # max number of cycles per trial
-            # doc in search-c.text, lines 316-317
-            # default value: max_cyles = 200
-            sparams.write("max_cycles = {} \n".format(max_cycles))
-
-            # start_j_list
-            # initial guess of the number of clusters
-            # doc in search-c.text, line 332
-            # default values: 2, 3, 5, 7, 10, 15, 25
-            sparams.write('start_j_list = 2, 3, 5, 7, 10, 15, 25, 35, 45, 55, 65, 75, 85, 95, 105 \n')
+            sparams.write("max_duration = {}\n".format(max_duration))
+            sparams.write("max_n_tries = {}\n".format(max_n_tries))
+            sparams.write("max_cycles = {}\n".format(max_cycles))
+            starters = [str(j) for j in start_j_list]
+            sparams.write("start_j_list = {}\n".format(", ".join(starters)))
 
 
     @handle_error
     def create_rparams_file(self):
-        """
-        Create .r-params file
+        """Create .r-params file (Autoclass report parameters)
         """
         log.info("Writing .r-params file")
-        with open("clust.r-params", "w") as rparams:
+        rparams_name = self.root_name + ".r-params"
+        with open(rparams_name, "w") as rparams:
             rparams.write('xref_class_report_att_list = 0, 1, 2 \n')
             rparams.write('report_mode = "data" \n')
             rparams.write('comment_data_headers_p = true \n')
@@ -297,14 +366,17 @@ class Input():
     @handle_error
     def create_run_file(self):
         """
-        Create .sh file
-
-        autoclass executable must be in the PATH
+        Create script that run autoclass
         """
         log.info("Writing run file")
-        with open('run_autoclass.sh', 'w') as runfile:
-            runfile.write("autoclass -search clust.db2 clust.hd2 clust.model clust.s-params \n")
-            runfile.write("autoclass -reports clust.results-bin clust.search clust.r-params \n")
+        run_name = self.root_name + ".sh"
+        with open(run_name, 'w') as runfile:
+            runfile.write("autoclass -search "
+                          "{0}.db2 {0}.hd2 {0}.model {0}.s-params \n"
+                          .format(self.root_name))
+            runfile.write("autoclass -reports "
+                          "{0}.results-bin {0}.search {0}.r-params \n"
+                          .format(self.root_name))
 
 
     @handle_error
@@ -323,43 +395,42 @@ class Input():
 
 
     @handle_error
-    def prepare_input_files(self):
-        """
-        Prepare input and parameters files
-        """
-        log.info("Preparing data and parameters files")
-        self.change_working_dir()
-        self.create_db2_file()
-        self.create_hd2_file()
-        self.create_model_file()
-        self.create_sparams_file()
-        self.create_rparams_file()
-        self.create_run_file()
-
-
-    @handle_error
     def run(self, tag=""):
-        """
-        Run autoclass
+        """Run autoclass clustering
+
+        autoclass executable must be in the PATH!
+
+        Parameters
+        ----------
+        tag : string (default: "")
+            Tag to identify the autoclass run among other processes
         """
         log.info("Running clustering...")
-        proc = subprocess.Popen(['bash', 'run_autoclass.sh', tag])
-        return True
+        run_name = self.root_name + ".sh"
+        proc = subprocess.Popen(['bash', run_name, tag])
 
 
     @handle_error
     def print_files(self):
         """
         Print generated files
+
+        Debug usage.
+
+        Returns
+        -------
+        content : string
+            Contain all autoclass parameter files concatenated.
         """
         content = ""
-        for name in ('clust.hd2', 'clust.model', 'clust.s-params', 'clust.r-params', 'run_autoclass.sh'):
+        for extension in (".hd2", ".model", ".s-params", ".r-params", ".sh"):
+            name = self.root_name + extension
             if os.path.exists(name):
                 content += "\n"
-                content += "--------------------------------------------------------------------------\n"
+                content += "-" * 80 + "\n"
                 content += "{}\n".format(name)
-                content += "--------------------------------------------------------------------------\n"
-                with open(name, 'r') as param_file:
+                content += "-" * 80 + "\n"
+                with open(name, "r") as param_file:
                     content += "".join( param_file.readlines() )
         return content
 
@@ -367,86 +438,114 @@ class Input():
 
 class Dataset():
     """
-    Class to handle autoclass data files
+    Handle input data
+
+    Parameters
+    ----------
+    input_file : string (defaut: "")
+        Name of the file to read data from.
+    data_type : string (dafault: "")
+        Type of data contained in input file.
+        Either "real scalar", "real location", "discrete" or "merged"
+        "merged" is special case corresponding to merged datasets.
+    error : int (default: None)
+        Value of error on data.
+    separator_char : string (defaut: "\t")
+        Character used to separate columns of data in input file.
+    missing_char : string (default: "")
+        Character used to encode missing data in input file.
+
+
+    Attributes
+    ----------
+    input_file : string (defaut: "")
+        Name of the file to read data from.
+    separator_char : string (defaut: "\t")
+        Character used to separate columns of data in input file.
+    df : Pandas dataframe (default: None)
+        All data are stored in a Pandas dataframe
+    column_meta : dict (default: {})
+        Dictionnary that contains metadata for each column.
+        Keys are column names.
+        Values are another dictionnary:
+        {"type": data_type, "error": error, "missing": False}
     """
 
 
-    def __init__(self):
+    def __init__(self,
+                 input_file="",
+                 data_type="",
+                 error=None,
+                 separator_char="\t",
+                 missing_char=""):
+        """Object instantiation
         """
-        Object instantiation
-        """
-        # filename of input_file
-        self.input_file = ""
-        # field separator
-        self.separator = "\t"
-        # Pandas dataframe with data
+        self.input_file = input_file
+        self.data_type = data_type
+        self.error = error
+        self.separator_char = separator_char
         self.df = None
-        # Column meta data: data type, error, missing values
         self.column_meta = {}
+        # verify data type
+        assert self.data_type in ['real scalar', 'real location', 'discrete', 'merged'], \
+               ("data type in {} should be: "
+                "'real scalar', 'real location' or 'discrete'"
+                .format(self.input_file))
 
 
     def check_duplicate_col_names(self):
-        """
-        Check duplicate column clean_column_names
+        """Check duplicate column clean_column_names
         """
         with open(self.input_file) as f_in:
-            header = f_in.readline().strip().split("\t")
+            header = f_in.readline().strip().split(self.separator_char)
             raise_on_duplicates(header)
 
 
     def guess_encoding(self):
-        """
-        Guess input file encoding
+        """Guess input file encoding
         """
         with open(self.input_file, 'rb') as f:
             enc_result = chardet.detect(f.read())
             return enc_result['encoding']
 
-    def read_datafile(self,
-                      input_file='',
-                      separator="\t",
-                      data_type='',
-                      error=None):
+
+    def read_datafile(self):
         """
         Read data file as pandas dataframe
 
-        Header is on first row (header=0)
-        Gene/protein/orf names are on first column (index_col=0)
+        Header must be on the first row (header=0)
+        Gene/protein/orf names must be on the first column (index_col=0)
         """
-        # verify data type
-        assert data_type in ['real scalar', 'real location', 'discrete'], \
-            ("data type in {} should be: "
-             "'real scalar', 'real location' or 'discrete'"
-             .format(input_file))
-        msg = "Reading data file '{}' as '{}'".format(input_file, data_type)
-        if data_type in ['real scalar', 'real location']:
-            msg += " with error {}".format(error)
+        msg = "Reading data file '{}' as '{}'".format(self.input_file,
+                                                      self.data_type)
+        if self.data_type in ['real scalar', 'real location']:
+            msg += " with error {}".format(self.error)
         log.info(msg)
         # check for duplicate column names
-        self.input_file = input_file
         self.check_duplicate_col_names()
         # find encoding
         encoding = self.guess_encoding()
         log.info("Detected encoding: {}".format(encoding))
         # load data
-        self.df = pd.read_table(input_file,
-                                sep=separator,
+        self.df = pd.read_table(self.input_file,
+                                sep=self.separator_char,
                                 header=0,
                                 index_col=0,
                                 encoding=encoding)
         nrows, ncols = self.df.shape
         # save column meta data (data type, error, missing values)
         for col in self.df.columns:
-            meta = {'type': data_type,
-                    'error': error,
-                    'missing': False}
+            meta = {"type": self.data_type,
+                    "error": self.error,
+                    "missing": False}
             self.column_meta[col] = meta
         log.info("Found {} rows and {} columns".format(nrows, ncols+1))
 
 
     def clean_column_names(self):
-        """
-        Cleanup column names
+        """Clean column names
+
+        Replace unwanted characters by '_'
         """
         regex = re.compile('[^A-Za-z0-9 .+-]+')
         log.debug("Checking column names")
@@ -467,14 +566,15 @@ class Dataset():
                 # update column meta data
                 self.column_meta[col_name_new] = self.column_meta.pop(col_name)
         # print all columns names
-        log.debug("Index name {}'".format(self.df.index.name))
+        log.debug("Index name '{}'".format(self.df.index.name))
         for name in self.df.columns:
             log.debug("Column name '{}'".format(name))
 
 
     def check_data_type(self):
-        """
-        Check data type
+        """Check data type
+
+        Cast 'real scalar' and 'real location' to float64
         """
         log.info("Checking data format")
         for col in self.df.columns:
@@ -482,27 +582,27 @@ class Dataset():
                 try:
                     self.df[col].astype('float64')
                     log.info("Column '{}'\n".format(col)
-                                 +self.df[col].describe(percentiles=[]).to_string())
+                             +self.df[col].describe(percentiles=[]).to_string()
+                            )
                 except:
                     raise CastFloat64(("Cannot cast column '{}' to float\n"
                                        "Check your input file!").format(col)
                                      )
             if self.column_meta[col]['type'] == "discrete":
                 log.info("Column '{}'\n{} different values"
-                             .format(col, self.df[col].nunique())
-                             )
+                         .format(col, self.df[col].nunique())
+                        )
 
 
     def search_missing_values(self):
+        """Search for missing values
         """
-        Search for missing values
-        """
-        log.info('Searching for missing values')
+        log.info("Searching for missing values")
         columns_with_missing = self.df.columns[ self.df.isnull().any() ].tolist()
         if columns_with_missing:
             for col in columns_with_missing:
                 self.column_meta[col]['missing'] = True
-            log.warning('Missing values found in columns: {}'
-                            .format(" ".join(columns_with_missing)))
+            log.warning("Missing values found in columns: '{}'"
+                        .format(" ".join(columns_with_missing)))
         else:
-            log.info('No missing values found')
+            log.info("No missing values found")
