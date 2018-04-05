@@ -203,7 +203,7 @@ class Output():
         Wrap results into a ziped file
         """
         t = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        zipname = "{}-clust.zip".format(t)
+        zipname = "{}-autoclass-clust.zip".format(t)
         with zipfile.ZipFile(zipname, "w") as outputzip:
             outputzip.write("clust.cdt")
             outputzip.write("clust_withprobs.cdt")
