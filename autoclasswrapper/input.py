@@ -495,7 +495,7 @@ class Dataset():
 
 
     def check_duplicate_col_names(self):
-        """Check duplicate column clean_column_names
+        """Check duplicate column names
         """
         with open(self.input_file) as f_in:
             header = f_in.readline().strip().split(self.separator_char)
