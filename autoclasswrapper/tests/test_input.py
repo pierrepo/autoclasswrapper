@@ -37,8 +37,7 @@ class TestDatasetClass(object):
         assert "10 rows and 4 columns" in caplog.text
 
 class TestInputClass(object):
-    """
-    Test for the Input class
+    """Test for the Input class
     """
 
     def test_init(self):
