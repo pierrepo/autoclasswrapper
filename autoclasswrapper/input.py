@@ -203,12 +203,12 @@ class Input():
         log.info("Writing {} file".format(db2_name))
         log.info("If any, missing values will be encoded as '{}'"
                  .format(self.db2_missing_char))
-        self.full_dataset.df.to_csv("clust.db2",
+        self.full_dataset.df.to_csv(db2_name,
                                     header=False,
                                     sep=self.db2_separator_char,
                                     na_rep=self.db2_missing_char)
         log.debug("Writing {} file [for later use]".format(tsv_name))
-        self.full_dataset.df.to_csv("clust.tsv",
+        self.full_dataset.df.to_csv(tsv_name,
                                     header=True,
                                     sep="\t",
                                     na_rep="")
@@ -336,7 +336,7 @@ class Input():
         """
         log.info("Writing .s-params file")
         sparams_name = self.root_name + ".s-params"
-        with open("clust.s-params", "w") as sparams:
+        with open(sparams_name, "w") as sparams:
             sparams.write("screen_output_p = false \n")
             sparams.write("break_on_warnings_p = false \n")
             sparams.write("force_new_search_p = true \n")
