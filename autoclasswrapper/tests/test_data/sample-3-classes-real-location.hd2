@@ -1,0 +1,8 @@
+num_db2_format_defs 2
+
+number_of_attributes 3
+separator_char '	'
+
+0 dummy nil "Name"
+1 real location "x" error 0.01
+2 real location "y" error 0.01

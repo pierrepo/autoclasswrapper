@@ -1,0 +1,8 @@
+num_db2_format_defs 2
+
+number_of_attributes 3
+separator_char '	'
+
+0 dummy nil "Name"
+1 real scalar "x" zero_point 0.0 rel_error 0.01
+2 real scalar "y" zero_point 0.0 rel_error 0.01
