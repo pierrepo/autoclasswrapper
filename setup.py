@@ -8,6 +8,7 @@ packages = ['autoclasswrapper']
 
 requires = [
     'chardet',
+    'numpy',
     'pandas'
 ]
 
