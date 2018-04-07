@@ -5,14 +5,10 @@ import re
 import zipfile
 import datetime
 
-import numpy as np
 import pandas as pd
 import chardet
 
 import logging
-# logging.basicConfig(format='%(asctime)s %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
-#     datefmt='%Y-%m-%d %H:%M:%S',
-#     level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 def raise_on_duplicates(input_list):
