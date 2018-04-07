@@ -51,7 +51,7 @@ class Output():
         self.class_number = 0
         self.stats = None
         self.df = None
-        self.experiment_names
+        self.experiment_names = []
 
 
     def handle_error(f):
@@ -141,7 +141,7 @@ class Output():
         """Aggregate autoclass classes with input data
         """
         log.info("Aggregating input data")
-        intput_name = self.root_name + ".tsv"
+        input_name = self.root_name + ".tsv"
         self.df = pd.read_table(input_name, sep="\t", header=0, index_col=0)
         nrows, ncols = self.df.shape
         self.experiment_names = list(self.df.columns)
@@ -166,9 +166,9 @@ class Output():
             log.info("Writing .cdt file")
         else:
             log.info("Writing .cdt file (with probs)")
-        filename = "clust.cdt"
+        filename = self.root_name + ".cdt"
         if with_proba:
-            filename = "clust_withprobs.cdt"
+            filename = self.root_name + "_withprobs.cdt"
         # add GWEIGHT
         self.df["gweight"] = 1
         # add gene name twice for formatting purpose
