@@ -9,6 +9,13 @@ import autoclasswrapper as wrapper
 here = os.path.abspath(os.path.dirname(__file__))
 dir_data = "test_data"
 
+@pytest.fixture(scope='session')
+def tmp_dir(tmpdir_factory):
+    """Create temp dir and cd in it
+    """
+    tmpd = tmpdir_factory.mktemp("input")
+    os.chdir(str(tmpd))
+
 class TestDatasetClass(object):
     """Tests for the Dataset class
     """
@@ -40,7 +47,7 @@ class TestInputClass(object):
     """Test for the Input class
     """
 
-    def test_init(self):
+    def test_init(self, tmp_dir):
         clust = wrapper.Input()
         assert clust.root_name == "clust"
         assert clust.db2_missing_char == "?"
