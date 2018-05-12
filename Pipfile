@@ -16,6 +16,7 @@ numpy = "*"
 pandas = "*"
 chardet = "*"
 "e1839a8" = {path = ".", editable = true}
+wheel = "*"
 
 
 [dev-packages]
