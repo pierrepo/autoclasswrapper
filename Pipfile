@@ -22,3 +22,5 @@ chardet = "*"
 
 pytest = "*"
 pytest-cov = "*"
+setuptools = "*"
+twine = "*"
