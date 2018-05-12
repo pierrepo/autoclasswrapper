@@ -2,15 +2,7 @@
 
 import os
 
-from setuptools import setup
-
-packages = ['autoclasswrapper']
-
-requires = [
-    'chardet',
-    'numpy',
-    'pandas'
-]
+from setuptools import setup, find_packages
 
 test_requirements = ['pytest>=2.8.0']
 
@@ -35,25 +27,27 @@ setup(
     author=about['__author__'],
     author_email=about['__author_email__'],
     url=about['__url__'],
-    packages=packages,
+    packages=find_packages(exclude=['doc*', 'test*']),
     package_data={'': ['LICENSE']},
     package_dir={'autoclasswrapper': 'autoclasswrapper'},
     include_package_data=True,
     python_requires=">=3.4",
-    install_requires=requires,
+    install_requires=['numpy', 'pandas', 'chardet'],
+    tests_require=['pytest', 'coverage'],
     license=about['__license__'],
     zip_safe=False,
     classifiers=(
         'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Science/Research',
         'Intended Audience :: Developers',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
         'Natural Language :: English',
-        'License :: OSI Approved :: BSD 3-Clause',
+        'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy'
+        'Programming Language :: Python :: 3.6'
     )
 )
