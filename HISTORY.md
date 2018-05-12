@@ -1,5 +1,8 @@
 **Dev**
 
+**0.1.4**
+- add MANIFEST.in
+
 **0.1.3**
 - remove tests from Python package
 

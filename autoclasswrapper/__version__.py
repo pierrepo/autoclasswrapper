@@ -1,7 +1,7 @@
 __title__ = 'autoclasswrapper'
 __description__ = 'Simple Python wrapper for autoclass-c.'
 __url__ = 'https://github.com/pierrepo/autoclasswrapper'
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 __author__ = 'Pierre Poulain'
 __author_email__ = 'pierre.poulain@cupnet.net'
 __license__ = 'BSD 3-Clause'
