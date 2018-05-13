@@ -1,5 +1,8 @@
 **Dev**
 
+**0.1.5**
+- move config options to setup.cfg
+
 **0.1.4**
 - add MANIFEST.in
 

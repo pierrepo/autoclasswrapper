@@ -1,4 +1,4 @@
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 __copyright__ = 'Copyright 2018 Pierre Poulain'
 
 import logging
