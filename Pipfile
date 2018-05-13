@@ -1,25 +1,17 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 name = "pypi"
 verify_ssl = true
 
-
 [requires]
-
 python_version = "3.5"
 
-
 [packages]
-
 numpy = "*"
 pandas = "*"
 chardet = "*"
-"e1839a8" = {path = ".", editable = true}
-
 
 [dev-packages]
-
 pytest = "*"
 pytest-cov = "*"
 setuptools = "*"
