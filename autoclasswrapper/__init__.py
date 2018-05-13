@@ -1,3 +1,6 @@
+__version__ = '0.1.4'
+__copyright__ = 'Copyright 2018 Pierre Poulain'
+
 import logging
 log = logging.getLogger(__name__)
 log_handler = logging.StreamHandler()
@@ -10,4 +13,3 @@ log.setLevel(logging.DEBUG)
 
 from .input import Input, Dataset, DuplicateColumnNameError
 from .output import Output
-from .__version__ import __version__
