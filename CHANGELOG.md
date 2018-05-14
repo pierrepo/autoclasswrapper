@@ -1,5 +1,8 @@
 **Dev**
 
+**0.1.6**
+- move distribution package to bdist_wheel
+
 **0.1.5**
 - move config options to setup.cfg
 

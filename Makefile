@@ -9,7 +9,8 @@ test-coverage:
 	pipenv run py.test --cov-config .coveragerc --cov=autoclasswrapper
 
 compile:
-	pipenv run python setup.py sdist
+	#pipenv run python setup.py sdist
+	pipenv run python setup.py bdist_wheel
 
 upload-to-pypi: compile
 	pipenv run twine upload dist/*
