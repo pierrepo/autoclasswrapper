@@ -1,5 +1,8 @@
 **Dev**
 
+**0.1.7**
+- add missing dependencies
+
 **0.1.6**
 - move distribution package to bdist_wheel
 
