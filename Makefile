@@ -3,7 +3,7 @@ init:
 	pipenv install --dev
 
 test:
-	pipenv run py.test
+	pipenv run py.test tests
 
 test-coverage:
 	pipenv run py.test --cov-config .coveragerc --cov=autoclasswrapper
