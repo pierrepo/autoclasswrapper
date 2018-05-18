@@ -1,5 +1,10 @@
 init:
 	pip install pipenv
+
+install: init
+	pipenv install --dev --skip-lock
+
+deploy: init
 	pipenv install --dev
 
 test:
