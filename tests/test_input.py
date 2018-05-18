@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-sys.path.insert(0,'..')
+sys.path.insert(0,os.getcwd())
 import autoclasswrapper as wrapper
 
 here = os.path.abspath(os.path.dirname(__file__))
