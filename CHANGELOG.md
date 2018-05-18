@@ -1,4 +1,5 @@
 **Dev**
+- fix typo with env in Popen()
 
 **0.1.8**
 - add env in Popen()

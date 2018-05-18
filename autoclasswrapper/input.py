@@ -403,7 +403,7 @@ class Input():
         """
         log.info("Running clustering...")
         run_name = self.root_name + ".sh"
-        proc = subprocess.Popen(['bash', run_name, tag], env=os.enviro)
+        proc = subprocess.Popen(['bash', run_name, tag], env=os.environ)
 
 
     @handle_error
