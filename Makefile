@@ -20,4 +20,4 @@ compile:
 upload-to-pypi: compile
 	pipenv run twine upload dist/*
 	# clean compiled
-	rm -f dist/*.tar.gz
+	rm -f dist/*.tar.gz dist/*.whl
