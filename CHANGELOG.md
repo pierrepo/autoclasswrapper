@@ -1,5 +1,8 @@
 **Dev**
 
+**0.1.8**
+- add env in Popen()
+
 **0.1.7**
 - add missing dependencies
 
