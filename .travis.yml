@@ -2,7 +2,6 @@ language: python
 # available Python versions:
 # sys.path.insert(0,os.getcwd())
 python:
-    - "3.4"
     - "3.5"
     - "3.6"
 install:
