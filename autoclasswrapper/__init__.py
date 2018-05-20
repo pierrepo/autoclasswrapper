@@ -1,5 +1,5 @@
-__version__ = '0.1.8'
-__copyright__ = 'Copyright 2018 Pierre Poulain'
+__version__ = "0.1.9"
+__copyright__ = "Copyright 2018 Pierre Poulain"
 
 import logging
 log = logging.getLogger(__name__)
@@ -13,3 +13,4 @@ log.setLevel(logging.DEBUG)
 
 from .input import Input, Dataset, DuplicateColumnNameError
 from .output import Output
+from .run import search_autoclass_in_path, Run

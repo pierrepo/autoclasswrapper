@@ -1,6 +1,5 @@
 import os
 import random
-import subprocess
 import re
 import zipfile
 import datetime
@@ -360,53 +359,6 @@ class Input():
 
 
     @handle_error
-    def create_run_file(self):
-        """
-        Create script that run autoclass
-        """
-        log.info("Writing run file")
-        run_name = self.root_name + ".sh"
-        with open(run_name, 'w') as runfile:
-            runfile.write("autoclass -search "
-                          "{0}.db2 {0}.hd2 {0}.model {0}.s-params \n"
-                          .format(self.root_name))
-            runfile.write("autoclass -reports "
-                          "{0}.results-bin {0}.search {0}.r-params \n"
-                          .format(self.root_name))
-
-
-    @handle_error
-    def create_run_file_test(self):
-        """
-        Create .sh file
-        """
-        log.info("Writing run file")
-        with open('run_autoclass.sh', 'w') as runfile:
-            runfile.write("for a in $(seq 1 60) \n")
-            runfile.write("do \n")
-            runfile.write("sleep 1 \n")
-            runfile.write("touch clust.log \n")
-            runfile.write("done \n")
-            runfile.write("touch clust.rlog \n")
-
-
-    @handle_error
-    def run(self, tag=""):
-        """Run autoclass clustering
-
-        autoclass executable must be in the PATH!
-
-        Parameters
-        ----------
-        tag : string (default: "")
-            Tag to identify the autoclass run among other processes
-        """
-        log.info("Running clustering...")
-        run_name = self.root_name + ".sh"
-        proc = subprocess.Popen(['bash', run_name, tag], env=os.environ)
-
-
-    @handle_error
     def print_files(self):
         """
         Print generated files
@@ -419,7 +371,7 @@ class Input():
             Contain all autoclass parameter files concatenated.
         """
         content = ""
-        for extension in (".hd2", ".model", ".s-params", ".r-params", ".sh"):
+        for extension in (".hd2", ".model", ".s-params", ".r-params"):
             name = self.root_name + extension
             if os.path.exists(name):
                 content += "\n"

@@ -1,5 +1,9 @@
 **Dev**
+
+**0.1.9**
 - fix typo with env in Popen()
+- check autoclass-c executable is in PATH
+- building and running script are in Run() class
 
 **0.1.8**
 - add env in Popen()
