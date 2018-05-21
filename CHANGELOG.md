@@ -1,7 +1,9 @@
 **Dev**
 
+**0.1.10**
+- search_autoclass_in_path() returns the PATH
+
 **0.1.9**
-- fix typo with env in Popen()
 - check autoclass-c executable is in PATH
 - building and running script are in Run() class
 

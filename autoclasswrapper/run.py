@@ -14,6 +14,7 @@ def search_autoclass_in_path():
         log.info("autoclass-c executable found in {}".format(autoclass_path))
     else:
         log.error("autoclass-c executable not found in path!")
+    return autoclass_path
 
 
 class Run():
