@@ -112,14 +112,6 @@ class TestInputClass(object):
             content = f.read()
         assert content == content_ref
 
-    def test_create_run_file(self, caplog):
-        clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample1.tsv")
-        clust.add_input_data(name, "real location")
-        clust.merge_dataframes()
-        clust.create_run_file()
-        assert os.path.isfile("clust.sh")
-
     def test_print_files(self):
         clust = wrapper.Input()
         name = os.path.join(here, dir_data, "sample1.tsv")
@@ -129,10 +121,8 @@ class TestInputClass(object):
         clust.create_model_file()
         clust.create_sparams_file()
         clust.create_rparams_file()
-        clust.create_run_file()
         content = clust.print_files()
         assert "clust.hd2" in content
         assert "clust.model" in content
         assert "clust.s-params" in content
         assert "clust.r-params" in content
-        assert "clust.sh" in content
