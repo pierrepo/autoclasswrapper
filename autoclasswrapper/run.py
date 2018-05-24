@@ -124,4 +124,7 @@ class Run():
         """
         log.info("Running clustering...")
         run_name = self.root_name + ".sh"
-        proc = subprocess.Popen(['bash', run_name, tag], env=os.environ)
+        proc = subprocess.Popen(['nohup', 'bash', run_name, tag], env=os.environ)
+
+
+

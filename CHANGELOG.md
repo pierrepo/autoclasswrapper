@@ -1,5 +1,8 @@
 **Dev**
 
+**0.1.11**
+- add nohup while running autoclass script
+
 **0.1.10**
 - search_autoclass_in_path() returns the PATH
 
