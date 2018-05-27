@@ -222,18 +222,19 @@ class Output():
 
         Mean and standard deviation values per experiment
         """
+        log.info("Writing cluster stats")
         # count number of unique classes
-        class_max = self.df["main-class"].nunique()
+        classes = self.df["main-class"].unique()
         stat_name = self.root_name + "_stat.tsv"
         with open(stat_name, "w") as statfile:
             # write headers
-            headers = ["cluster"] + self.experiment_names
+            headers = ["cluster", "stat"] + self.experiment_names
             statfile.write("{}\n".format("\t".join(headers)))
             # write classes
-            for class_idx in range(class_max):
+            for class_idx in classes:
                 cluster = self.df[self.df["main-class"]==class_idx]
-                row_mean = ["cluster{:03.0f}mean".format(class_idx)]
-                row_std  = ["cluster{:03.0f}std".format(class_idx)]
+                row_mean = ["{:03.0f}".format(class_idx), "mean"]
+                row_std  = ["{:03.0f}".format(class_idx), "std"]
                 for exp in self.experiment_names:
                     row_mean.append("{:.3f}".format(cluster.mean()[exp]))
                     row_std.append("{:.3f}".format(cluster.std()[exp]))

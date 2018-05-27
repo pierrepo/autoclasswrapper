@@ -1,4 +1,6 @@
 **Dev**
+- update write_cluster_stats() methods with mean/std column
+
 
 **0.1.11**
 - add nohup while running autoclass script
