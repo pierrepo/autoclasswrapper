@@ -1,6 +1,6 @@
 language: python
 # available Python versions:
-# sys.path.insert(0,os.getcwd())
+# https://docs.travis-ci.com/user/languages/python/#Development-releases-support
 python:
     - "3.5"
     - "3.6"
