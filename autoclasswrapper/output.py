@@ -151,6 +151,17 @@ class Output():
                 .format(len(self.stats.index), datafile))
         self.stats.index = self.df.index
         self.df = pd.concat([self.df, self.stats], axis=1)
+        # prepare data for export
+        log.info("Writing _data.tsv file")
+        headers = ["main-class", "main-prob"] + self.experiment_names
+        df_output = self.df.loc[:, headers]
+        df_output.rename(index=str,
+                         columns={"main-class": "cluster",
+                                  "main-prob": "proba"},
+                         inplace=True)
+        # first cluster is 1 instead of 0
+        df_output["cluster"] = df_output["cluster"] + 1
+        df_output.to_csv("clust_data.tsv", sep="\t", header=True, index=True)
 
 
     @handle_error

@@ -1,6 +1,8 @@
 **Dev**
-- update write_cluster_stats() methods with mean/std column
 
+**0.1.12**
+- update write_cluster_stats() methods with mean/std column
+- output data+clusters in clust_data.tsv 
 
 **0.1.11**
 - add nohup while running autoclass script
