@@ -46,7 +46,6 @@ class Run():
         self.tolerate_error = tolerate_error
         self.had_error = False
 
-
     def handle_error(f):
         """Handle error during data parsing and formating
 
@@ -70,7 +69,6 @@ class Run():
                     self.had_error = True
         return try_function
 
-
     @handle_error
     def create_run_file(self):
         """Create script that run autoclass
@@ -84,7 +82,6 @@ class Run():
             runfile.write("autoclass -reports "
                           "{0}.results-bin {0}.search {0}.r-params \n"
                           .format(self.root_name))
-
 
     @handle_error
     def create_run_file_test(self, time=60):
@@ -110,7 +107,6 @@ class Run():
             runfile.write("done \n")
             runfile.write("touch {} \n".format(rlog_name))
 
-
     @handle_error
     def run(self, tag=""):
         """Run autoclass clustering
@@ -124,7 +120,5 @@ class Run():
         """
         log.info("Running clustering...")
         run_name = self.root_name + ".sh"
-        proc = subprocess.Popen(['nohup', 'bash', run_name, tag], env=os.environ)
-
-
-
+        proc = subprocess.Popen(['nohup', 'bash', run_name, tag],
+                                env=os.environ)

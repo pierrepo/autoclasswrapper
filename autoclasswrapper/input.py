@@ -1,14 +1,12 @@
 import os
-import random
 import re
-import zipfile
-import datetime
 
 import pandas as pd
 import chardet
 
 import logging
 log = logging.getLogger(__name__)
+
 
 def raise_on_duplicates(input_list):
     """Verify if a list as duplicated values
@@ -29,7 +27,7 @@ def raise_on_duplicates(input_list):
                 ("Found duplicate column names:\n"
                  "{}\n"
                  "Please clean your header"
-                ).format(" ".join(col_names)) )
+                ).format(" ".join(col_names)))
 
 
 class DuplicateColumnNameError(Exception):
@@ -91,7 +89,6 @@ class Input():
         self.input_datasets = []
         self.full_dataset = Dataset("", "merged")
 
-
     def handle_error(f):
         """Handle error during data parsing and formating
 
@@ -114,16 +111,6 @@ class Input():
                         log.error(line)
                     self.had_error = True
         return try_function
-
-
-    # @handle_error
-    # def change_working_dir(self):
-    #     """
-    #     change working dir
-    #     """
-    #     log.info("Changing working directory")
-    #     os.chdir(self.inputfolder)
-
 
     @handle_error
     def add_input_data(self,
@@ -157,7 +144,6 @@ class Input():
         dataset.clean_column_names()
         dataset.check_data_type()
         self.input_datasets.append(dataset)
-
 
     @handle_error
     def merge_dataframes(self):
@@ -519,7 +505,6 @@ class Dataset():
         for name in self.df.columns:
             log.debug("Column name '{}'".format(name))
 
-
     def check_data_type(self):
         """Check data type
 
@@ -531,25 +516,24 @@ class Dataset():
                 try:
                     self.df[col].astype('float64')
                     log.info("Column '{}'\n".format(col)
-                             +self.df[col].describe(percentiles=[]).to_string()
-                            )
+                             + self.df[col].describe(percentiles=[]).to_string()
+                             )
                 except Exception as e:
                     raise CastFloat64(("Cannot cast column '{}' to float\n"
                                        "{}\n"
                                        "Check your input file!"
-                                      ).format(col, str(e))
-                                     )
+                                       ).format(col, str(e))
+                                      )
             if self.column_meta[col]['type'] == "discrete":
                 log.info("Column '{}'\n{} different values"
                          .format(col, self.df[col].nunique())
-                        )
-
+                         )
 
     def search_missing_values(self):
         """Search for missing values
         """
         log.info("Searching for missing values")
-        columns_with_missing = self.df.columns[ self.df.isnull().any() ].tolist()
+        columns_with_missing = self.df.columns[self.df.isnull().any()].tolist()
         if columns_with_missing:
             for col in columns_with_missing:
                 self.column_meta[col]['missing'] = True
