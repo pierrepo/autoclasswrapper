@@ -533,9 +533,11 @@ class Dataset():
                     log.info("Column '{}'\n".format(col)
                              +self.df[col].describe(percentiles=[]).to_string()
                             )
-                except:
+                except Exception as e:
                     raise CastFloat64(("Cannot cast column '{}' to float\n"
-                                       "Check your input file!").format(col)
+                                       "{}\n"
+                                       "Check your input file!"
+                                      ).format(col, str(e))
                                      )
             if self.column_meta[col]['type'] == "discrete":
                 log.info("Column '{}'\n{} different values"

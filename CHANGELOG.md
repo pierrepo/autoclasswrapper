@@ -1,4 +1,5 @@
 **Dev**
+- print Exception content for check_data_type() 
 
 **0.1.12**
 - update write_cluster_stats() methods with mean/std column
