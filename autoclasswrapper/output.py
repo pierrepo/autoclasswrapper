@@ -231,7 +231,8 @@ class Output():
     def write_cluster_stats(self):
         """Writing cluster stat file
 
-        Mean and standard deviation values per experiment
+        Number of elements per class.
+        Mean and standard deviation values per experiment.
         """
         log.info("Writing cluster stats")
         # count number of unique classes
@@ -244,11 +245,14 @@ class Output():
             # write classes
             for class_idx in classes:
                 cluster = self.df[self.df["main-class"]==class_idx]
-                row_mean = ["{:03.0f}".format(class_idx), "mean"]
-                row_std  = ["{:03.0f}".format(class_idx), "std"]
+                row_count = ["{:03.0f}".format(class_idx+1), "count"]
+                row_mean = ["{:03.0f}".format(class_idx+1), "mean"]
+                row_std  = ["{:03.0f}".format(class_idx+1), "std"]
                 for exp in self.experiment_names:
+                    row_count.append("{:.0f}".format(cluster[exp].shape[0]))
                     row_mean.append("{:.3f}".format(cluster.mean()[exp]))
                     row_std.append("{:.3f}".format(cluster.std()[exp]))
+                statfile.write("\t".join(row_count)+"\n")
                 statfile.write("\t".join(row_mean)+"\n")
                 statfile.write("\t".join(row_std)+"\n")
 
