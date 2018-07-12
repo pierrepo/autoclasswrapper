@@ -114,7 +114,7 @@ class Output():
                  .format(self.case_number, self.class_number))
         columns = ["main-class", "main-prob"]
         for i in range(self.class_number):
-            columns.append( "prob-class-{}".format(i) )
+            columns.append( "prob-class-{}".format(i+1) )
         self.stats = pd.DataFrame(0.0,
                                   index=np.arange(1, self.case_number+1),
                                   columns=columns)
@@ -132,7 +132,7 @@ class Output():
                         .format(input_file, line.rstrip()))
                 case = int(items[0])
                 for idx in range(1, len(items), 2):
-                    class_id = int(items[idx])
+                    class_id = int(items[idx]) + 1
                     proba = float(items[idx+1])
                     if idx == 1:
                         self.stats.loc[case, "main-class"] = class_id
@@ -188,7 +188,7 @@ class Output():
         self.df["idx"] = np.arange(1, self.df.shape[0]+1, dtype=int)
         self.df["gid"] = self.df.apply(lambda x: "GENE{:04d}-CL{:03.0f}X"
                                                  .format(x["idx"],
-                                                         x["main-class"]+1),
+                                                         x["main-class"]),
                                        axis=1)
         # sort by increasing class
         self.df.sort_values(by=["main-class", "main-prob"],
