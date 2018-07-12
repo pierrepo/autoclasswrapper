@@ -16,7 +16,8 @@ class TestOutputClass(object):
 
     def test_init(self):
         res = wrapper.Output()
-        assert res.root_name == "clust"
+        assert res.root_in_name == "clust"
+        assert res.root_out_name == "clust_out"
         assert res.tolerate_error == False
         assert res.case_number == 0
         assert res.class_number == 0
