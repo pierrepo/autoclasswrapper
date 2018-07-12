@@ -1,9 +1,12 @@
 **Dev**
-- print Exception content for check_data_type() 
+- print Exception content for check_data_type()
+- output class probability for every gene/protein
+- simplify the calculation of cluster stats
+
 
 **0.1.12**
 - update write_cluster_stats() methods with mean/std column
-- output data+clusters in clust_data.tsv 
+- output data+clusters in clust_data.tsv
 
 **0.1.11**
 - add nohup while running autoclass script
