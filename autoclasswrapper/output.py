@@ -270,5 +270,6 @@ class Output():
         with zipfile.ZipFile(zipname, "w") as outputzip:
             outputzip.write(self.root_out_name + ".cdt")
             outputzip.write(self.root_out_name + "_withprobs.cdt")
+            outputzip.write(self.root_out_name + ".tsv")
             outputzip.write(self.root_out_name + "_stats.tsv")
         return zipname
