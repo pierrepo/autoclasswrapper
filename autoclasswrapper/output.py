@@ -1,8 +1,11 @@
 import datetime
 import zipfile
+import os
 
 import numpy as np
 import pandas as pd
+import scipy.cluster.hierarchy as hierarchy
+import matplotlib.pyplot as plt
 
 import logging
 log = logging.getLogger(__name__)
@@ -254,6 +257,32 @@ class Output():
         col = list(df_stats.columns)
         df_stats = df_stats[[col[-1], col[-2], *col[:-2]]]
         df_stats.to_csv(stat_name, sep="\t", header=True, index=False)
+
+
+    @handle_error
+    def write_dendrogram(self):
+        """Write dendrogram of hierarchical clustering of classes to file.
+        """
+        log.info("Writing dendrogram")
+        stat_name = self.root_out_name + "_stats.tsv"
+        if not os.path.exists(stat_name):
+            log.error("Cannot find stat_name")
+        df = pd.read_csv(stat_name, sep="\t")
+        # keep only 'mean'
+        df = df[df["stat"]=="mean"]
+        # remove NA
+        df.dropna(inplace=True)
+        # keep cluster labels
+        labels = df["cluster"]
+        # remove unwanted columns
+        df.drop(labels=["stat", "cluster"], axis=1, inplace=True)
+        Z = hierarchy.linkage(df, 'ward')
+        plt.figure(figsize=(10, 6))
+        plt.title('Hierarchical Clustering Dendrogram')
+        plt.xlabel('Cluster #')
+        plt.ylabel('Distance')
+        hierarchy.dendrogram(Z, color_threshold=0.0, above_threshold_color='grey', labels=["{:.0f}".format(clust) for clust in labels])
+        plt.savefig(self.root_out_name + "_dendrogram.png")
 
 
     @handle_error
