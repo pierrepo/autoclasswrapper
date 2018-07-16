@@ -76,8 +76,12 @@ class Run():
         log.info("Writing run file")
         run_name = self.root_name + ".sh"
         with open(run_name, "w") as runfile:
+            # the "y" paramter is to validate warning
+            # is case of for reproducible run
             runfile.write("autoclass -search "
-                          "{0}.db2 {0}.hd2 {0}.model {0}.s-params \n"
+                          "{0}.db2 {0}.hd2 {0}.model {0}.s-params <<EOF\n"
+                          "y\n"
+                          "EOF\n"
                           .format(self.root_name))
             runfile.write("autoclass -reports "
                           "{0}.results-bin {0}.search {0}.r-params \n"

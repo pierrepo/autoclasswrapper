@@ -292,7 +292,8 @@ class Input():
                             max_n_tries=200,
                             max_cycles=1000,
                             start_j_list=[2, 3, 5, 7, 10, 15, 25, 35,
-                                          45, 55, 65, 75, 85, 95, 105]):
+                                          45, 55, 65, 75, 85, 95, 105],
+                            reproducible_run=False):
         """Create .s-params file (Autoclass search parameters)
 
         Parameters
@@ -317,7 +318,19 @@ class Input():
             Autoclass default: 2, 3, 5, 7, 10, 15, 25
             For more details, see autoclass documentation:
             file search-c.text, line 332
-
+        reproducible_run : boolean (default: False)
+            If set to True, define parameters to obtain reproducible run.
+            This parameters are considered "for testing *only*" by autoclass-c
+            and should NOT be used for production run.
+            The following autoclass-c parameters are set:
+                - randomize_random_p = false
+                Random seed is set to 1 (instead of the usual current time)
+                - start_fn_type = "block"
+                Instead of "random"
+            For more details, see autoclass documentation:
+            file search-c.text, line 678
+            file search-c.text, line 565
+            file search-c.text, line 525
         """
         log.info("Writing .s-params file")
         sparams_name = self.root_name + ".s-params"
@@ -330,6 +343,9 @@ class Input():
             sparams.write("max_cycles = {}\n".format(max_cycles))
             starters = [str(j) for j in start_j_list]
             sparams.write("start_j_list = {}\n".format(", ".join(starters)))
+            if reproducible_run == True:
+                sparams.write("randomize_random_p = false\n")
+                sparams.write('start_fn_type = "block"\n')
 
 
     @handle_error
