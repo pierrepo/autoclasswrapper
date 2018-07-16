@@ -44,13 +44,13 @@ class TestDatasetClass(object):
             ds.check_duplicate_col_names()
 
     def test_read_datafile(self, caplog):
-        name = os.path.join(here, dir_data, "sample1.tsv")
+        name = os.path.join(here, dir_data, "sample-real-location.tsv")
         ds = wrapper.Dataset(name, "real location", error=0.01)
         ds.read_datafile()
         assert "10 rows and 4 columns" in caplog.text
 
     def test_check_data_type_real_location_OK(self, caplog):
-        name = os.path.join(here, dir_data, "sample1.tsv")
+        name = os.path.join(here, dir_data, "sample-real-location.tsv")
         ds = wrapper.Dataset(name, "real location", error=0.01)
         ds.read_datafile()
         ds.check_data_type()
@@ -108,7 +108,7 @@ class TestInputClass(object):
 
     def test_add_input_data(self):
         clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample1.tsv")
+        name = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name)
 
     def test_add_input_data_dup_col_names(self, caplog):
@@ -119,7 +119,7 @@ class TestInputClass(object):
 
     def test_create_db2_file(self, caplog):
         clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample1.tsv")
+        name = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name, "real location")
         clust.merge_dataframes()
         clust.create_db2_file()
@@ -128,7 +128,7 @@ class TestInputClass(object):
 
     def test_create_hd2_file(self, caplog):
         clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample1.tsv")
+        name = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name, "real location")
         clust.merge_dataframes()
         clust.create_hd2_file()
@@ -136,7 +136,7 @@ class TestInputClass(object):
 
     def test_create_model_file(self, caplog):
         clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample1.tsv")
+        name = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name, "real location")
         clust.merge_dataframes()
         clust.create_model_file()
@@ -144,7 +144,7 @@ class TestInputClass(object):
 
     def test_create_sparams_file(self, caplog):
         clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample1.tsv")
+        name = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name, "real location")
         clust.merge_dataframes()
         clust.create_sparams_file()
@@ -152,7 +152,7 @@ class TestInputClass(object):
 
     def test_create_sparams_file_repro_run(self, caplog):
         clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample1.tsv")
+        name = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name, "real location")
         clust.merge_dataframes()
         clust.create_sparams_file(reproducible_run=True)
@@ -177,7 +177,7 @@ class TestInputClass(object):
 
     def test_print_files(self):
         clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample1.tsv")
+        name = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name, "real location")
         clust.merge_dataframes()
         clust.create_hd2_file()
