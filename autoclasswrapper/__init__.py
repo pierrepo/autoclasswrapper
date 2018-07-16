@@ -11,6 +11,7 @@ log_handler.setFormatter(log_formatter)
 log.addHandler(log_handler)
 log.setLevel(logging.DEBUG)
 
-from .input import Input, Dataset, DuplicateColumnNameError
+from .input import Input, Dataset
+from .input import raise_on_duplicates, DuplicateColumnNameError, CastFloat64Error
 from .output import Output
 from .run import search_autoclass_in_path, Run

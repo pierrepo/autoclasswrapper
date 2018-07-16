@@ -38,7 +38,7 @@ class DuplicateColumnNameError(Exception):
         self.message = message
 
 
-class CastFloat64(Exception):
+class CastFloat64Error(Exception):
     """Exception raised when data column cannot be casted to float64 type
     """
 
@@ -498,7 +498,7 @@ class Dataset():
 
         Replace unwanted characters by '_'
         """
-        regex = re.compile('[^A-Za-z0-9 .+-]+')
+        regex = re.compile('[^A-Za-z0-9 ._+-]+')
         log.debug("Checking column names")
         # check index column name first
         col_name = self.df.index.name
@@ -535,13 +535,13 @@ class Dataset():
                              + self.df[col].describe(percentiles=[]).to_string()
                              )
                 except Exception as e:
-                    raise CastFloat64(("Cannot cast column '{}' to float\n"
-                                       "{}\n"
-                                       "Check your input file!"
-                                       ).format(col, str(e))
-                                      )
+                    raise CastFloat64Error(("Cannot cast column '{}' to float\n"
+                                            "{}\n"
+                                            "Check your input file!"
+                                            ).format(col, str(e))
+                                           )
             if self.column_meta[col]['type'] == "discrete":
-                log.info("Column '{}'\n{} different values"
+                log.info("Column '{}': {} different values"
                          .format(col, self.df[col].nunique())
                          )
 

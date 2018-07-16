@@ -16,6 +16,12 @@ def tmp_dir(tmpdir_factory):
     tmpd = tmpdir_factory.mktemp("input")
     os.chdir(str(tmpd))
 
+def test_raise_on_duplicates(caplog):
+    with pytest.raises(wrapper.DuplicateColumnNameError,
+                       message="Expecting DuplicateColumnNameError"):
+        wrapper.raise_on_duplicates(["A", "B", "B"])
+
+
 class TestDatasetClass(object):
     """Tests for the Dataset class
     """
@@ -42,6 +48,52 @@ class TestDatasetClass(object):
         ds = wrapper.Dataset(name, "real location", error=0.01)
         ds.read_datafile()
         assert "10 rows and 4 columns" in caplog.text
+
+    def test_check_data_type_real_location_OK(self, caplog):
+        name = os.path.join(here, dir_data, "sample1.tsv")
+        ds = wrapper.Dataset(name, "real location", error=0.01)
+        ds.read_datafile()
+        ds.check_data_type()
+        assert "10 rows and 4 columns" in caplog.text
+        assert "Column 'colA'" in caplog.text
+        assert "Column 'colB'" in caplog.text
+        assert "Column 'colC'" in caplog.text
+
+    def test_check_data_type_real_location_not_OK(self, caplog):
+        name = os.path.join(here, dir_data, "sample-discrete.tsv")
+        ds = wrapper.Dataset(name, "real location", error=0.01)
+        ds.read_datafile()
+        assert "10 rows and 3 columns" in caplog.text
+        with pytest.raises(wrapper.CastFloat64Error,
+                           message="Expecting CastFloat64Error exception"):
+            ds.check_data_type()
+
+    def test_check_data_type_discrete_OK(self, caplog):
+        name = os.path.join(here, dir_data, "sample-discrete.tsv")
+        ds = wrapper.Dataset(name, "discrete")
+        ds.read_datafile()
+        ds.check_data_type()
+        assert "10 rows and 3 columns" in caplog.text
+        assert "Column 'colA': 2 different values" in caplog.text
+        assert "Column 'colB': 3 different values" in caplog.text
+
+    def test_search_missing_values(self, caplog):
+        name = os.path.join(here, dir_data, "sample-missing-values.tsv")
+        ds = wrapper.Dataset(name, "real location", error=0.01)
+        ds.read_datafile()
+        ds.search_missing_values()
+        assert ("WARNING  Missing values found in columns:"
+                " 'colB colC'") in caplog.text
+
+    def test_clean_column_names(self, caplog):
+        name = os.path.join(here, dir_data, "sample-column-names.tsv")
+        ds = wrapper.Dataset(name, "real location", error=0.01)
+        ds.read_datafile()
+        ds.clean_column_names()
+        assert "Column 'coléèà' renamed to 'col_'" in caplog.text
+        assert "Column 'col[]()/' renamed to 'col_'" in caplog.text
+
+
 
 class TestInputClass(object):
     """Test for the Input class
@@ -97,6 +149,17 @@ class TestInputClass(object):
         clust.merge_dataframes()
         clust.create_sparams_file()
         assert os.path.isfile("clust.s-params")
+
+    def test_create_sparams_file_repro_run(self, caplog):
+        clust = wrapper.Input()
+        name = os.path.join(here, dir_data, "sample1.tsv")
+        clust.add_input_data(name, "real location")
+        clust.merge_dataframes()
+        clust.create_sparams_file(reproducible_run=True)
+        assert os.path.isfile("clust.s-params")
+        f_content = open("clust.s-params", "r").read()
+        assert "randomize_random_p = false" in f_content
+        assert 'start_fn_type = "block"' in f_content
 
     def test_create_rparams_file(self):
         filename = "clust.r-params"
