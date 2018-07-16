@@ -11,7 +11,7 @@ test:
 	pipenv run py.test tests
 
 test-coverage:
-	pipenv run py.test --cov-config .coveragerc --cov=autoclasswrapper
+	pipenv run py.test --cov-config .coveragerc --cov=autoclasswrapper --cov-report term-missing
 
 compile:
 	#pipenv run python setup.py sdist
