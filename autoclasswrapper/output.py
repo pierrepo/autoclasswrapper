@@ -175,6 +175,7 @@ class Output():
         with_proba : bool (default False)
             If True, also writes probability of case to belong to each class.
         """
+        df_tmp = self.df.copy(deep=True)
         if not with_proba:
             log.info("Writing .cdt file")
             filename = self.root_out_name + ".cdt"
@@ -182,18 +183,18 @@ class Output():
             log.info("Writing .cdt file (with probs)")
             filename = self.root_out_name + "_withprobs.cdt"
         # add GWEIGHT
-        self.df["gweight"] = 1
+        df_tmp["gweight"] = 1
         # add gene name twice for formatting purpose
-        self.df["name1"] = self.df.index
-        self.df["name2"] = self.df.index
+        df_tmp["name1"] = df_tmp.index
+        df_tmp["name2"] = df_tmp.index
         # build gid
-        self.df["idx"] = np.arange(1, self.df.shape[0]+1, dtype=int)
-        self.df["gid"] = self.df.apply(lambda x: "GENE{:04d}-CL{:03.0f}X"
+        df_tmp["idx"] = np.arange(1, df_tmp.shape[0]+1, dtype=int)
+        df_tmp["gid"] = df_tmp.apply(lambda x: "GENE{:04d}-CL{:03.0f}X"
                                                  .format(x["idx"],
                                                          x["main-class"]),
                                        axis=1)
         # sort by increasing class
-        self.df.sort_values(by=["main-class", "main-prob"],
+        df_tmp.sort_values(by=["main-class", "main-prob"],
                             ascending=[True, False],
                             inplace=True)
         with open(filename, "w") as cdtfile:
@@ -216,7 +217,7 @@ class Output():
                 col_names += ["prob-class-{}"
                               .format(i+1) for i in range(self.class_number)]
             for class_idx in range(1, self.class_number+1):
-                cluster = self.df[self.df["main-class"]==class_idx]
+                cluster = df_tmp[df_tmp["main-class"]==class_idx]
                 cdtfile.write(cluster.to_csv(sep="\t",
                                              columns=col_names,
                                              index=False,
@@ -265,7 +266,8 @@ class Output():
         log.info("Writing dendrogram")
         stat_name = self.root_out_name + "_stats.tsv"
         if not os.path.exists(stat_name):
-            log.error("Cannot find stat_name")
+            log.error("Cannot find {}".format(stat_name))
+            return 0
         df = pd.read_csv(stat_name, sep="\t")
         # keep only 'mean'
         df = df[df["stat"]=="mean"]
@@ -296,8 +298,10 @@ class Output():
         t = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         zipname = "{}-autoclass-clust.zip".format(t)
         with zipfile.ZipFile(zipname, "w") as outputzip:
-            outputzip.write(self.root_out_name + ".cdt")
-            outputzip.write(self.root_out_name + "_withprobs.cdt")
-            outputzip.write(self.root_out_name + ".tsv")
-            outputzip.write(self.root_out_name + "_stats.tsv")
+            for extension in (".tsv", ".cdt", "_withprobs.cdt",
+                              "_stats.tsv", "_dendrogram.png"):
+                filename = self.root_out_name + extension
+                if os.path.exists(filename):
+                    outputzip.write(filename)
+                    log.info("{} added to zip file".format(filename))
         return zipname

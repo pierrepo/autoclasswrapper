@@ -7,6 +7,7 @@
 - add reproducible run option (test only)
 - add tests for Input() class
 - add tests for Output() class
+- add tests for Run() class
 
 **0.1.12**
 - update write_cluster_stats() methods with mean/std column

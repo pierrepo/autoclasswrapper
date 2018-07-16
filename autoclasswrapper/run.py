@@ -11,9 +11,9 @@ def search_autoclass_in_path():
     """
     autoclass_path = shutil.which("autoclass")
     if autoclass_path:
-        log.info("autoclass-c executable found in {}".format(autoclass_path))
+        log.info("autoclass executable found in {}".format(autoclass_path))
     else:
-        log.error("autoclass-c executable not found in path!")
+        log.error("autoclass executable not found in path!")
     return autoclass_path
 
 
