@@ -5,6 +5,7 @@
 - class/cluster numbering starts at 1 (0-based in autoclass output)
 - add dendrogram of classes
 - add reproducible run option (test only)
+- add tests for Input() class
 
 **0.1.12**
 - update write_cluster_stats() methods with mean/std column

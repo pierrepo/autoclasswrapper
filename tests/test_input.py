@@ -74,8 +74,8 @@ class TestDatasetClass(object):
         ds.read_datafile()
         ds.check_data_type()
         assert "10 rows and 3 columns" in caplog.text
-        assert "Column 'colA': 2 different values" in caplog.text
-        assert "Column 'colB': 3 different values" in caplog.text
+        assert "Column 'colD': 2 different values" in caplog.text
+        assert "Column 'colE': 3 different values" in caplog.text
 
     def test_search_missing_values(self, caplog):
         name = os.path.join(here, dir_data, "sample-missing-values.tsv")
@@ -83,13 +83,14 @@ class TestDatasetClass(object):
         ds.read_datafile()
         ds.search_missing_values()
         assert ("WARNING  Missing values found in columns:"
-                " 'colB colC'") in caplog.text
+                " 'colI colJ'") in caplog.text
 
     def test_clean_column_names(self, caplog):
         name = os.path.join(here, dir_data, "sample-column-names.tsv")
         ds = wrapper.Dataset(name, "real location", error=0.01)
         ds.read_datafile()
         ds.clean_column_names()
+        assert "Column 'gene(name)' renamed to 'gene_name_'" in caplog.text
         assert "Column 'coléèà' renamed to 'col_'" in caplog.text
         assert "Column 'col[]()/' renamed to 'col_'" in caplog.text
 
@@ -117,10 +118,26 @@ class TestInputClass(object):
         clust.add_input_data(name, "real location")
         assert "Found duplicate column names" in caplog.text
 
+    def test_merge_data(self, caplog):
+        clust = wrapper.Input()
+        name1 = os.path.join(here, dir_data, "sample-real-location.tsv")
+        clust.add_input_data(name1, "real location")
+        name2 = os.path.join(here, dir_data, "sample-discrete.tsv")
+        clust.add_input_data(name2, "discrete")
+        name3 = os.path.join(here, dir_data, "sample-real-scalar.tsv")
+        clust.add_input_data(name3, "real scalar")
+        clust.merge_dataframes()
+        print(caplog.text)
+        assert "Final dataframe has 10 lines and 8 columns" in caplog.text
+
     def test_create_db2_file(self, caplog):
         clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample-real-location.tsv")
-        clust.add_input_data(name, "real location")
+        name1 = os.path.join(here, dir_data, "sample-real-location.tsv")
+        clust.add_input_data(name1, "real location")
+        name2 = os.path.join(here, dir_data, "sample-discrete.tsv")
+        clust.add_input_data(name2, "discrete")
+        name3 = os.path.join(here, dir_data, "sample-real-scalar.tsv")
+        clust.add_input_data(name3, "real scalar")
         clust.merge_dataframes()
         clust.create_db2_file()
         assert os.path.isfile("clust.db2")
@@ -128,16 +145,26 @@ class TestInputClass(object):
 
     def test_create_hd2_file(self, caplog):
         clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample-real-location.tsv")
-        clust.add_input_data(name, "real location")
+        name1 = os.path.join(here, dir_data, "sample-real-location.tsv")
+        clust.add_input_data(name1, "real location")
+        name2 = os.path.join(here, dir_data, "sample-discrete.tsv")
+        clust.add_input_data(name2, "discrete")
+        name3 = os.path.join(here, dir_data, "sample-real-scalar.tsv")
+        clust.add_input_data(name3, "real scalar")
         clust.merge_dataframes()
         clust.create_hd2_file()
         assert os.path.isfile("clust.hd2")
 
     def test_create_model_file(self, caplog):
         clust = wrapper.Input()
-        name = os.path.join(here, dir_data, "sample-real-location.tsv")
-        clust.add_input_data(name, "real location")
+        name1 = os.path.join(here, dir_data, "sample-real-location.tsv")
+        clust.add_input_data(name1, "real location")
+        name2 = os.path.join(here, dir_data, "sample-discrete.tsv")
+        clust.add_input_data(name2, "discrete")
+        name3 = os.path.join(here, dir_data, "sample-real-scalar.tsv")
+        clust.add_input_data(name3, "real scalar")
+        name4 = os.path.join(here, dir_data, "sample-missing-values.tsv")
+        clust.add_input_data(name4, "real location")
         clust.merge_dataframes()
         clust.create_model_file()
         assert os.path.isfile("clust.model")
