@@ -177,10 +177,9 @@ class Output():
         """
         if not with_proba:
             log.info("Writing .cdt file")
+            filename = self.root_out_name + ".cdt"
         else:
             log.info("Writing .cdt file (with probs)")
-        filename = self.root_out_name + ".cdt"
-        if with_proba:
             filename = self.root_out_name + "_withprobs.cdt"
         # add GWEIGHT
         self.df["gweight"] = 1
@@ -202,7 +201,7 @@ class Output():
             headers = ["GID", "UNIQID", "NAME", "GWEIGHT"]
             headers += self.experiment_names
             if with_proba:
-                headers += ["prob-class-{}"
+                headers += ["probability-class-{}"
                             .format(i+1) for i in range(self.class_number)]
             cdtfile.write("{}\n".format("\t".join(headers)))
             # write 'EWEIGHT' line
@@ -211,13 +210,13 @@ class Output():
                 eweight += "\t1"*self.class_number
             cdtfile.write(eweight + "\n")
             # write classes
-            for class_idx in range(self.class_number):
+            col_names = ["gid", "name1", "name2", "gweight"]
+            col_names += self.experiment_names
+            if with_proba:
+                col_names += ["prob-class-{}"
+                              .format(i+1) for i in range(self.class_number)]
+            for class_idx in range(1, self.class_number+1):
                 cluster = self.df[self.df["main-class"]==class_idx]
-                col_names = ["gid", "name1", "name2", "gweight"]
-                col_names += self.experiment_names
-                if with_proba:
-                    col_names += ["prob-class-{}"
-                                  .format(i) for i in range(self.class_number)]
                 cdtfile.write(cluster.to_csv(sep="\t",
                                              columns=col_names,
                                              index=False,
