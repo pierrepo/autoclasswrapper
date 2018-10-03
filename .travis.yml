@@ -1,5 +1,7 @@
+sudo: false
 language: python
 dist: "xenial"
+sudo: true
 
 # available Python versions:
 # https://docs.travis-ci.com/user/languages/python/#Development-releases-support
