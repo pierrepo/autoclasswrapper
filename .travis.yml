@@ -1,10 +1,12 @@
 language: python
+dist: "xenial"
 
 # available Python versions:
 # https://docs.travis-ci.com/user/languages/python/#Development-releases-support
 python:
     - "3.5"
     - "3.6"
+    - "3.7"
 
 install:
     - make install
