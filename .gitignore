@@ -1,7 +1,7 @@
 test-data/
 __pycache__/
 .ipynb_checkpoints/
-
+examples/
 
 # tests
 __pycache__/
@@ -12,3 +12,4 @@ __pycache__/
 # Python package builds
 autoclasswrapper.egg-info/
 dist/
+build/
