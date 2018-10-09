@@ -1,4 +1,6 @@
 **Dev**
+
+**0.0.13**
 - print Exception content for check_data_type()
 - output class probability for every gene/protein
 - simplify the calculation of cluster stats
