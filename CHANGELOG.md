@@ -1,4 +1,7 @@
 **Dev**
+
+**0.0.14**
+- add Python 3.7 support 
 - update missing dependencies in setup.cfg
 
 **0.0.13**
