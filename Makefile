@@ -1,4 +1,7 @@
 init:
+	#this fix a temporary bug (09/10/2018) with pip 18.1
+	#https://github.com/pypa/pipenv/issues/2924
+	pip install pip==18.0
 	pip install pipenv
 
 install: init
