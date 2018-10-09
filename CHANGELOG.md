@@ -1,4 +1,5 @@
 **Dev**
+- update missing dependencies in setup.cfg
 
 **0.0.13**
 - print Exception content for check_data_type()
