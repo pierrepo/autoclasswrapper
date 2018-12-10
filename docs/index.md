@@ -1,5 +1,8 @@
 # Autoclasswrapper  documentation
 
+- TOC
+{:toc}
+
 ## Installation
 
 `autoclasswrapper` is available for Python 3.x only.
