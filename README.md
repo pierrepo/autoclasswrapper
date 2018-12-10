@@ -10,6 +10,7 @@ AutoClass is an unsupervised Bayesian classification system.
 
 autoclasswrapper is a Python wrapper to ease the use of Autoclass C.
 
+
 ## Quick install
 ```
 $ python3 -m pip install autoclasswrapper
@@ -19,3 +20,8 @@ or
 $ pipenv --three
 $ pipenv install autoclasswrapper
 ```
+
+
+## Documentation
+
+Documentation is available [here](https://pierrepo.github.io/autoclasswrapper/)
