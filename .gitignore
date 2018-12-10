@@ -3,16 +3,24 @@ __pycache__/
 .ipynb_checkpoints/
 examples/
 
+
 # tests
 __pycache__/
 .pytest_cache/
 .coverage
 
 
+# demo
+demo/clust.*
+demo/nohup.out
+demo/clust_out*
+
+
 # Python package builds
 autoclasswrapper.egg-info/
 dist/
 build/
+
 
 # local installation of autoclass
 autoclass-c
