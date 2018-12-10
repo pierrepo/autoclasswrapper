@@ -39,3 +39,8 @@ class TestRunClass(object):
         run = wrapper.Run()
         run.create_run_file_test()
         assert os.path.isfile("clust.sh")
+
+    def test_get_version(self, caplog):
+        run = wrapper.Run()
+        run.get_autoclass_version()
+        assert "AUTOCLASS" in caplog.text

@@ -126,3 +126,16 @@ class Run():
         run_name = self.root_name + ".sh"
         proc = subprocess.Popen(['nohup', 'bash', run_name, tag],
                                 env=os.environ)
+
+    @handle_error
+    def get_autoclass_version(self):
+        """Output autoclass version.
+
+        Returns
+        -------
+        version : str
+        """
+        version = subprocess.check_output(["autoclass"])
+        version = version.decode("utf8").strip()
+        log.info("Autoclass version: {}".format(version))
+        return version
