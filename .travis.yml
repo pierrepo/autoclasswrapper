@@ -24,6 +24,7 @@ before_script:
     - export PATH=$PATH:$(pwd)/autoclass-c
     - echo $PATH
     - echo $TRAVIS_BUILD_DIR
+    - $TRAVIS_BUILD_DIR/autoclass-c/autoclass
 
 script:
     - make test
