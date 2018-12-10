@@ -23,6 +23,7 @@ before_script:
     - "sh -e /etc/init.d/xvfb start"
     - export PATH=$PATH:$(pwd)/autoclass-c
     - echo $PATH
+    - echo $TRAVIS_BUILD_DIR
 
 script:
     - make test
