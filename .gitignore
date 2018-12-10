@@ -13,3 +13,6 @@ __pycache__/
 autoclasswrapper.egg-info/
 dist/
 build/
+
+# local installation of autoclass
+autoclass-c

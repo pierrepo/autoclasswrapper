@@ -24,3 +24,9 @@ upload-to-pypi: compile
 	pipenv run twine upload dist/*
 	# clean compiled
 	rm -f dist/*.tar.gz dist/*.whl
+
+autoclass: init
+	# https://ti.arc.nasa.gov/tech/rse/synthesis-projects-applications/autoclass/autoclass-c/
+	wget https://ti.arc.nasa.gov/m/project/autoclass/autoclass-c-3-3-6.tar.gz
+	tar zxvf autoclass-c-3-3-6.tar.gz
+	rm -f autoclass-c-3-3-6.tar.gz

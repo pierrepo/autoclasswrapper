@@ -12,6 +12,8 @@ python:
 
 install:
     - make install
+    - make autoclass
+    - export PATH=$PATH:$(pwd)/autoclass-c/
 
 before_script:
     # Tricks to avoid matplotlib error about X11:
