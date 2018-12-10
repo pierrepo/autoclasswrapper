@@ -21,6 +21,7 @@ before_script:
     # http://docs.travis-ci.com/user/gui-and-headless-browsers/#Starting-a-Web-Server
     - "export DISPLAY=:99.0"
     - "sh -e /etc/init.d/xvfb start"
+    - apt-get install -y lib32z1
     - export PATH=$PATH:$(pwd)/autoclass-c
     - echo $PATH
     - echo $TRAVIS_BUILD_DIR
