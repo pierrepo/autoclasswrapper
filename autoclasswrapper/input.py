@@ -1,15 +1,20 @@
+"""autoclasswrapper: Python wrapper for AutoClass clustering.
+
+Input files and parameters
+"""
+
+import logging
 import os
 import re
 
-import pandas as pd
 import chardet
+import pandas as pd
 
-import logging
 log = logging.getLogger(__name__)
 
 
 def raise_on_duplicates(input_list):
-    """Verify if a list as duplicated values
+    """Verify if a list as duplicated values.
 
     Parameters
     ----------
@@ -20,34 +25,35 @@ def raise_on_duplicates(input_list):
     ----------
     DuplicateColumnNameError : exception
         If there is a duplicated element in the input list.
+
     """
     if len(input_list) != len(set(input_list)):
         col_names = ["'{}'".format(name) for name in input_list]
         raise DuplicateColumnNameError(
-                ("Found duplicate column names:\n"
-                 "{}\n"
-                 "Please clean your header"
-                ).format(" ".join(col_names)))
+            ("Found duplicate column names:\n"
+             "{}\n"
+             "Please clean your header"
+             ).format(" ".join(col_names)))
 
 
 class DuplicateColumnNameError(Exception):
-    """Exception raised when column names are identical
-    """
+    """Exception raised when column names are identical."""
 
     def __init__(self, message):
+        """Instantiate object."""
         self.message = message
 
 
 class CastFloat64Error(Exception):
-    """Exception raised when data column cannot be casted to float64 type
-    """
+    """Exception raised when data column cannot be casted to float64 type."""
 
     def __init__(self, message):
+        """Instantiate object."""
         self.message = message
 
 
 class Input():
-    """Autoclass input files and parameters
+    r"""Autoclass input files and parameters.
 
     Parameters
     ----------
@@ -72,6 +78,7 @@ class Input():
         List of all input Datasets.
     full_dataset : Dataset() object
         Final Dataset used by autoclass.
+
     """
 
     def __init__(self,
@@ -79,8 +86,7 @@ class Input():
                  db2_separator_char="\t",
                  db2_missing_char="?",
                  tolerate_error=False):
-        """Object instanciation
-        """
+        """Instantiate object."""
         self.root_name = root_name
         self.db2_separator_char = db2_separator_char
         self.db2_missing_char = db2_missing_char
@@ -90,7 +96,7 @@ class Input():
         self.full_dataset = Dataset("", "merged")
 
     def handle_error(f):
-        """Handle error during data parsing and formating
+        """Handle error during data parsing and formating.
 
         Function decorator.
 
@@ -101,6 +107,7 @@ class Input():
         Returns
         -------
         try_function : function wrapped into error handler
+
         """
         def try_function(self, *args, **kwargs):
             if self.tolerate_error or not self.had_error:
@@ -121,7 +128,7 @@ class Input():
                        input_error=None,
                        input_separator_char="\t",
                        input_missing_char=""):
-        """Read input data file and append to list of datasets
+        r"""Read input data file and append to list of datasets.
 
         Parameters
         ----------
@@ -136,6 +143,7 @@ class Input():
             Character used to separate columns of data in input file.
         input_missing_char : string (default: "")
             Character used to encode missing data in input file.
+
         """
         dataset = Dataset(input_file,
                           input_type,
@@ -149,7 +157,7 @@ class Input():
 
     @handle_error
     def merge_dataframes(self):
-        """Merge input dataframes from datasets
+        """Merge input dataframes from datasets.
 
         Notes
         -----
@@ -157,6 +165,7 @@ class Input():
         https://pandas.pydata.org/pandas-docs/stable/merging.html
         - all lines are kept
         - missing data might appear
+
         """
         if len(self.input_datasets) == 1:
             self.full_dataset = self.input_datasets[0]
@@ -166,8 +175,8 @@ class Input():
             for dataset in self.input_datasets:
                 df_lst.append(dataset.df)
                 # 'merge' column meta data
-                self.full_dataset.column_meta ={**self.full_dataset.column_meta,
-                                                **dataset.column_meta}
+                self.full_dataset.column_meta = \
+                    {**self.full_dataset.column_meta, **dataset.column_meta}
             # merge dataframes
             self.full_dataset.df = pd.concat(df_lst, axis=1, join="outer")
         # check for identical column names
@@ -178,10 +187,9 @@ class Input():
                  .format(nrows, ncols+1))
         self.full_dataset.search_missing_values()
 
-
     @handle_error
     def create_db2_file(self):
-        """Create .db2 file (data)
+        """Create .db2 file (data).
 
         Also save all data into a .tsv file for later user.
         """
@@ -200,11 +208,9 @@ class Input():
                                     sep="\t",
                                     na_rep="")
 
-
     @handle_error
     def create_hd2_file(self):
-        """Create .hd2 file (Autoclass data descriptions)
-        """
+        """Create .hd2 file (Autoclass data descriptions)."""
         log.info("Writing .hd2 file")
         hd2_name = self.root_name + ".hd2"
         column_names = self.full_dataset.df.columns
@@ -224,28 +230,28 @@ class Input():
                     # by default minimum value is set to 0.0
                     assert self.full_dataset.df.min()[idx] >= 0.0, \
                            "min value for {} shoud be >= 0.0".format(name)
-                    hd2.write('{} real scalar "{}" zero_point 0.0 rel_error {}\n'
+                    hd2.write(('{} real scalar "{}" '
+                               'zero_point 0.0 rel_error {}\n')
                               .format(idx+1,
                                       name,
                                       meta["error"])
-                             )
+                              )
                 if meta["type"] == "real location":
                     hd2.write('{} real location "{}" error {}\n'
                               .format(idx+1,
                                       name,
                                       meta["error"])
-                             )
+                              )
                 if meta["type"] == "discrete":
                     hd2.write('{} discrete nominal "{}" range {}\n'
                               .format(idx+1,
                                       name,
                                       self.full_dataset.df[name].nunique())
-                             )
-
+                              )
 
     @handle_error
     def create_model_file(self):
-        """Create .model file (Autoclass data models)
+        """Create .model file (Autoclass data models).
 
         Choice of model based on data type and missing values
         """
@@ -254,7 +260,7 @@ class Input():
         # available models:
         real_values_normals = []
         real_values_missing = []
-        multinomial_values  = []
+        multinomial_values = []
         # assign column data to models
         for col_idx, col_name in enumerate(self.full_dataset.df.columns):
             meta = self.full_dataset.column_meta[col_name]
@@ -285,8 +291,7 @@ class Input():
                             .format(" ".join(real_values_missing)))
             if multinomial_values:
                 model.write("single_multinomial {}\n"
-                            .format(" ".format(multinomial_values)))
-
+                            .format(" ".join(multinomial_values)))
 
     @handle_error
     def create_sparams_file(self,
@@ -296,7 +301,7 @@ class Input():
                             start_j_list=[2, 3, 5, 7, 10, 15, 25, 35,
                                           45, 55, 65, 75, 85, 95, 105],
                             reproducible_run=False):
-        """Create .s-params file (Autoclass search parameters)
+        """Create .s-params file (Autoclass search parameters).
 
         Parameters
         ----------
@@ -325,14 +330,15 @@ class Input():
             This parameters are considered "for testing *only*" by autoclass-c
             and should NOT be used for production run.
             The following autoclass-c parameters are set:
-                - randomize_random_p = false
+            - randomize_random_p = false
                 Random seed is set to 1 (instead of the usual current time)
-                - start_fn_type = "block"
+            - start_fn_type = "block"
                 Instead of "random"
             For more details, see autoclass documentation:
             file search-c.text, line 678
             file search-c.text, line 565
             file search-c.text, line 525
+
         """
         log.info("Writing .s-params file")
         sparams_name = self.root_name + ".s-params"
@@ -345,15 +351,13 @@ class Input():
             sparams.write("max_cycles = {}\n".format(max_cycles))
             starters = [str(j) for j in start_j_list]
             sparams.write("start_j_list = {}\n".format(", ".join(starters)))
-            if reproducible_run == True:
+            if reproducible_run is True:
                 sparams.write("randomize_random_p = false\n")
                 sparams.write('start_fn_type = "block"\n')
 
-
     @handle_error
     def create_rparams_file(self):
-        """Create .r-params file (Autoclass report parameters)
-        """
+        """Create .r-params file (Autoclass report parameters)."""
         log.info("Writing .r-params file")
         rparams_name = self.root_name + ".r-params"
         with open(rparams_name, "w") as rparams:
@@ -361,11 +365,10 @@ class Input():
             rparams.write('report_mode = "data" \n')
             rparams.write('comment_data_headers_p = true \n')
 
-
     @handle_error
     def print_files(self):
         """
-        Print generated files
+        Print generated files.
 
         Debug usage.
 
@@ -373,6 +376,7 @@ class Input():
         -------
         content : string
             Contain all autoclass parameter files concatenated.
+
         """
         content = ""
         for extension in (".hd2", ".model", ".s-params", ".r-params"):
@@ -383,14 +387,12 @@ class Input():
                 content += "{}\n".format(name)
                 content += "-" * 80 + "\n"
                 with open(name, "r") as param_file:
-                    content += "".join( param_file.readlines() )
+                    content += "".join(param_file.readlines())
         return content
 
 
-
 class Dataset():
-    """
-    Handle input data
+    r"""Handle input data.
 
     Parameters
     ----------
@@ -421,8 +423,8 @@ class Dataset():
         Keys are column names.
         Values are another dictionnary:
         {"type": data_type, "error": error, "missing": False}
-    """
 
+    """
 
     def __init__(self,
                  input_file="",
@@ -430,8 +432,7 @@ class Dataset():
                  error=None,
                  separator_char="\t",
                  missing_char=""):
-        """Object instantiation
-        """
+        """Object instantiation."""
         self.input_file = input_file
         self.data_type = data_type
         self.error = error
@@ -440,31 +441,33 @@ class Dataset():
         self.df = None
         self.column_meta = {}
         # verify data type
-        assert self.data_type in ['real scalar', 'real location', 'discrete', 'merged'], \
-               ("data type in {} should be: "
-                "'real scalar', 'real location' or 'discrete'"
-                .format(self.input_file))
-
+        assert self.data_type in \
+            ['real scalar', 'real location', 'discrete', 'merged'], \
+            ("data type in {} should be: "
+             "'real scalar', 'real location' or 'discrete'"
+             .format(self.input_file))
 
     def check_duplicate_col_names(self):
-        """Check duplicate column names
-        """
+        """Check duplicate column names."""
         with open(self.input_file) as f_in:
             header = f_in.readline().strip().split(self.separator_char)
             raise_on_duplicates(header)
 
-
     def guess_encoding(self):
-        """Guess input file encoding
+        """Guess input file encoding.
+
+        Returns
+        -------
+         : string
+            Type of encoding.
+
         """
         with open(self.input_file, 'rb') as f:
             enc_result = chardet.detect(f.read())
             return enc_result['encoding']
 
-
     def read_datafile(self):
-        """
-        Read data file as pandas dataframe
+        """Read data file as pandas dataframe.
 
         Header must be on the first row (header=0)
         Gene/protein/orf names must be on the first column (index_col=0)
@@ -494,9 +497,8 @@ class Dataset():
             self.column_meta[col] = meta
         log.info("Found {} rows and {} columns".format(nrows, ncols+1))
 
-
     def clean_column_names(self):
-        """Clean column names
+        """Clean column names.
 
         Replace unwanted characters by '_'
         """
@@ -508,14 +510,14 @@ class Dataset():
         if col_name_new != col_name:
             self.df.index.name = col_name_new
             log.warning("Column '{}' renamed to '{}'"
-                            .format(col_name, col_name_new))
+                        .format(col_name, col_name_new))
         # then other column names
         for col_name in self.df.columns:
             col_name_new = regex.sub("_", col_name)
             if col_name_new != col_name:
                 self.df.rename(columns={col_name: col_name_new}, inplace=True)
                 log.warning("Column '{}' renamed to '{}'"
-                                .format(col_name, col_name_new))
+                            .format(col_name, col_name_new))
                 # update column meta data
                 self.column_meta[col_name_new] = self.column_meta.pop(col_name)
         # print all columns names
@@ -524,20 +526,23 @@ class Dataset():
             log.debug("Column name '{}'".format(name))
 
     def check_data_type(self):
-        """Check data type
+        """Check data type.
 
         Cast 'real scalar' and 'real location' to float64
         """
         log.info("Checking data format")
         for col in self.df.columns:
-            if self.column_meta[col]['type'] in ['real scalar', 'real location']:
+            if self.column_meta[col]['type'] in ['real scalar',
+                                                 'real location']:
                 try:
                     self.df[col].astype('float64')
                     log.info("Column '{}'\n".format(col)
-                             + self.df[col].describe(percentiles=[]).to_string()
+                             + (self.df[col].describe(percentiles=[])
+                                            .to_string())
                              )
                 except Exception as e:
-                    raise CastFloat64Error(("Cannot cast column '{}' to float\n"
+                    raise CastFloat64Error(("Cannot cast column '{}' "
+                                            "to float\n"
                                             "{}\n"
                                             "Check your input file!"
                                             ).format(col, str(e))
@@ -548,8 +553,7 @@ class Dataset():
                          )
 
     def search_missing_values(self):
-        """Search for missing values
-        """
+        """Search for missing values."""
         log.info("Searching for missing values")
         columns_with_missing = self.df.columns[self.df.isnull().any()].tolist()
         if columns_with_missing:

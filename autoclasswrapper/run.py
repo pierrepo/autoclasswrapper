@@ -1,13 +1,25 @@
+"""autoclasswrapper: Python wrapper for AutoClass clustering.
+
+Create run script and run classification
+"""
+
 import shutil
 import subprocess
 import os
 
 import logging
+
 log = logging.getLogger(__name__)
 
 
 def search_autoclass_in_path():
-    """Search if autoclass-c executable is in PATH
+    """Search if autoclass-c executable is in PATH.
+
+    Returns
+    -------
+    str
+        Path to autoclass binary.
+
     """
     autoclass_path = shutil.which("autoclass")
     if autoclass_path:
@@ -18,7 +30,7 @@ def search_autoclass_in_path():
 
 
 class Run():
-    """Autoclass running script
+    """Autoclass running script.
 
     Parameters
     ----------
@@ -35,19 +47,19 @@ class Run():
     had_error : bool (defaut False)
         Set to True if an error has been found in the generation of autoclass
         input files.
+
     """
 
     def __init__(self,
                  root_name="clust",
                  tolerate_error=False):
-        """Object instanciation
-        """
+        """Instantiate object."""
         self.root_name = root_name
         self.tolerate_error = tolerate_error
         self.had_error = False
 
     def handle_error(f):
-        """Handle error during data parsing and formating
+        """Handle error during data parsing and formating.
 
         Function decorator.
 
@@ -58,6 +70,7 @@ class Run():
         Returns
         -------
         try_function : function wrapped into error handler
+
         """
         def try_function(self, *args, **kwargs):
             if self.tolerate_error or not self.had_error:
@@ -71,8 +84,7 @@ class Run():
 
     @handle_error
     def create_run_file(self):
-        """Create script that run autoclass
-        """
+        """Create script that run autoclass."""
         log.info("Writing run file")
         run_name = self.root_name + ".sh"
         with open(run_name, "w") as runfile:
@@ -98,6 +110,7 @@ class Run():
         ----------
         time : int (default: 60)
             Time in seconds to wait.
+
         """
         log.info("Writing dummy run file")
         run_name = self.root_name + ".sh"
@@ -113,7 +126,7 @@ class Run():
 
     @handle_error
     def run(self, tag=""):
-        """Run autoclass clustering
+        """Run autoclass clustering.
 
         autoclass-c executable must be in PATH!
 
@@ -121,6 +134,7 @@ class Run():
         ----------
         tag : string (default: "")
             Tag to identify the autoclass run among other processes
+
         """
         log.info("Running clustering...")
         run_name = self.root_name + ".sh"
@@ -134,6 +148,8 @@ class Run():
         Returns
         -------
         version : str
+            Autoclass version
+
         """
         version = subprocess.check_output(["autoclass"])
         version = version.decode("utf8").strip()
