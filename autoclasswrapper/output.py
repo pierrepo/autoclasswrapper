@@ -99,7 +99,7 @@ class Output():
         - Number of cases (i.e. genes/proteins)
         - Number of classes (i.e. clusters)
         - For each case X, most probable class
-        - For each case X, probability belonging to class Y
+        - For each case X, probability to belong to class Y
         """
         log.info("Extracting autoclass results")
         case_name = self.root_in_name + ".case-data-1"
@@ -161,7 +161,7 @@ class Output():
         assert len(self.stats.index) == nrows, \
             ("Number of cases found in results ({}) "
              "should match number of rows in input file ({})!"
-             .format(len(self.stats.index), datafile))
+             .format(len(self.stats.index), input_name))
         self.stats.index = self.df.index
         self.df = pd.concat([self.df, self.stats], axis=1)
         # prepare data for export
