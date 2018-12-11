@@ -1,17 +1,23 @@
+"""autoclasswrapper: Python wrapper for AutoClass clustering.
+
+Prepare output files and results
+"""
+
 import datetime
-import zipfile
+import logging
 import os
+import zipfile
 
 import numpy as np
 import pandas as pd
 import scipy.cluster.hierarchy as hierarchy
 import matplotlib.pyplot as plt
 
-import logging
 log = logging.getLogger(__name__)
 
+
 class Output():
-    """Autoclass output files and results
+    """Autoclass output files and results.
 
     Parameters
     ----------
@@ -20,7 +26,7 @@ class Output():
         Example: "clust" will lead to "clust.db2", "clust.model"...
     root_out_name : string (default: root_in_name + "_out")
         Root name to write output files
-        Example: "clust_out" will lead to "clust_out.cdt", "clust_out_stats.tsv"
+        Ex.: "clust_out" will lead to "clust_out.cdt", "clust_out_stats.tsv"
     tolerate_error : bool (default: False)
         If True, countinue generation of autoclass input files even if an
         error is encounter.
@@ -43,14 +49,14 @@ class Output():
     experiment_names : list of string (defaut [])
         List of experiment (conditions) names.
         Corresponds to columns in the input data.
+
     """
 
     def __init__(self,
                  root_in_name="clust",
                  root_out_name="clust_out",
                  tolerate_error=False):
-        """Object instanciation
-        """
+        """Instantiate object."""
         self.root_in_name = root_in_name
         self.root_out_name = self.root_in_name + "_out"
         self.tolerate_error = tolerate_error
@@ -61,9 +67,8 @@ class Output():
         self.df = None
         self.experiment_names = []
 
-
     def handle_error(f):
-        """Handle error during data parsing and formating
+        """Handle error during data parsing and formating.
 
         Function decorator.
 
@@ -74,6 +79,7 @@ class Output():
         Returns
         -------
         try_function : function wrapped into error handler
+
         """
         def try_function(self, *args, **kwargs):
             if self.tolerate_error or not self.had_error:
@@ -85,10 +91,9 @@ class Output():
                     self.had_error = True
         return try_function
 
-
     @handle_error
     def extract_results(self):
-        """Extract results from autoclass
+        """Extract results from autoclass.
 
         Results extracted are:
         - Number of cases (i.e. genes/proteins)
@@ -117,7 +122,7 @@ class Output():
                  .format(self.case_number, self.class_number))
         columns = ["main-class", "main-prob"]
         for i in range(self.class_number):
-            columns.append( "prob-class-{}".format(i+1) )
+            columns.append("prob-class-{}".format(i+1))
         self.stats = pd.DataFrame(0.0,
                                   index=np.arange(1, self.case_number+1),
                                   columns=columns)
@@ -129,10 +134,10 @@ class Output():
                 if line.startswith("#") or line.startswith("DATA"):
                     continue
                 items = line.split()
-                assert len(items) >=0, \
-                       ("Need case#, class and prob in {}:\n "
-                        "{}\n"
-                        .format(input_file, line.rstrip()))
+                assert len(items) >= 0, \
+                    ("Need case#, class and prob in {}:\n "
+                     "{}\n"
+                     .format(input_file, line.rstrip()))
                 case = int(items[0])
                 for idx in range(1, len(items), 2):
                     class_id = int(items[idx]) + 1
@@ -145,35 +150,36 @@ class Output():
         # cast class id to int
         self.stats["main-class"] = self.stats["main-class"].astype(int)
 
-
     @handle_error
     def aggregate_input_data(self):
-        """Aggregate autoclass classes with input data
-        """
+        """Aggregate autoclass classes with input data."""
         log.info("Aggregating input data")
         input_name = self.root_in_name + ".tsv"
         self.df = pd.read_table(input_name, sep="\t", header=0, index_col=0)
         nrows, ncols = self.df.shape
         self.experiment_names = list(self.df.columns)
         assert len(self.stats.index) == nrows, \
-               ("Number of cases found in results ({}) "
-                "should match number of rows in input file ({})!"
-                .format(len(self.stats.index), datafile))
+            ("Number of cases found in results ({}) "
+             "should match number of rows in input file ({})!"
+             .format(len(self.stats.index), datafile))
         self.stats.index = self.df.index
         self.df = pd.concat([self.df, self.stats], axis=1)
         # prepare data for export
         log.info("Writing clust + probs .tsv file")
-        self.df.to_csv(self.root_out_name + ".tsv", sep="\t", header=True, index=True)
-
+        self.df.to_csv(self.root_out_name + ".tsv",
+                       sep="\t",
+                       header=True,
+                       index=True)
 
     @handle_error
     def write_cdt(self, with_proba=False):
-        """Write .cdt file for visualisation
+        """Write .cdt file for visualisation.
 
         Parameters
         ----------
         with_proba : bool (default False)
             If True, also writes probability of case to belong to each class.
+
         """
         df_tmp = self.df.copy(deep=True)
         if not with_proba:
@@ -189,14 +195,14 @@ class Output():
         df_tmp["name2"] = df_tmp.index
         # build gid
         df_tmp["idx"] = np.arange(1, df_tmp.shape[0]+1, dtype=int)
-        df_tmp["gid"] = df_tmp.apply(lambda x: "GENE{:04d}-CL{:03.0f}X"
-                                                 .format(x["idx"],
-                                                         x["main-class"]),
-                                       axis=1)
+        df_tmp["gid"] = df_tmp.apply(
+            lambda x: "GENE{:04d}-CL{:03.0f}X".format(x["idx"],
+                                                      x["main-class"]),
+            axis=1)
         # sort by increasing class
         df_tmp.sort_values(by=["main-class", "main-prob"],
-                            ascending=[True, False],
-                            inplace=True)
+                           ascending=[True, False],
+                           inplace=True)
         with open(filename, "w") as cdtfile:
             # write header line
             headers = ["GID", "UNIQID", "NAME", "GWEIGHT"]
@@ -217,7 +223,7 @@ class Output():
                 col_names += ["prob-class-{}"
                               .format(i+1) for i in range(self.class_number)]
             for class_idx in range(1, self.class_number+1):
-                cluster = df_tmp[df_tmp["main-class"]==class_idx]
+                cluster = df_tmp[df_tmp["main-class"] == class_idx]
                 cdtfile.write(cluster.to_csv(sep="\t",
                                              columns=col_names,
                                              index=False,
@@ -228,18 +234,16 @@ class Output():
                     cdtfile.write("GENE{:04d}-{:03.0f}S\n"
                                   .format(dummy, class_idx))
 
-
-
     @handle_error
     def write_cluster_stats(self):
-        """Writing cluster stat file
+        """Write cluster stat file.
 
         Number of elements per class.
         Mean and standard deviation values per experiment.
         """
         log.info("Writing cluster stats")
         stat_name = self.root_out_name + "_stats.tsv"
-        df_tmp = self.df[ ["main-class"] + self.experiment_names ]
+        df_tmp = self.df[["main-class"] + self.experiment_names]
         # compute metrics
         df_count = df_tmp.groupby("main-class").count()
         df_count["stat"] = "count"
@@ -258,11 +262,9 @@ class Output():
         df_stats = df_stats[[col[-1], col[-2], *col[:-2]]]
         df_stats.to_csv(stat_name, sep="\t", header=True, index=False)
 
-
     @handle_error
     def write_dendrogram(self):
-        """Write dendrogram of hierarchical clustering of classes to file.
-        """
+        """Write dendrogram of hierarchical clustering of classes to file."""
         log.info("Writing dendrogram")
         stat_name = self.root_out_name + "_stats.tsv"
         if not os.path.exists(stat_name):
@@ -270,7 +272,7 @@ class Output():
             return 0
         df = pd.read_csv(stat_name, sep="\t")
         # keep only 'mean'
-        df = df[df["stat"]=="mean"]
+        df = df[df["stat"] == "mean"]
         # remove NA
         df.dropna(inplace=True)
         # keep cluster labels
@@ -282,18 +284,22 @@ class Output():
         plt.title('Hierarchical Clustering Dendrogram')
         plt.xlabel('Cluster #')
         plt.ylabel('Distance')
-        hierarchy.dendrogram(Z, color_threshold=0.0, above_threshold_color='grey', labels=["{:.0f}".format(clust) for clust in labels])
+        hierarchy.dendrogram(
+            Z,
+            color_threshold=0.0,
+            above_threshold_color='grey',
+            labels=["{:.0f}".format(clust) for clust in labels])
         plt.savefig(self.root_out_name + "_dendrogram.png")
-
 
     @handle_error
     def wrap_outputs(self):
-        """Wrap results into a zipped file
+        """Wrap results into a zipped file.
 
         Returns
         -------
         zipname : string
             Name of the zip file that contains output files
+
         """
         t = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         zipname = "{}-autoclass-clust.zip".format(t)
