@@ -1,5 +1,7 @@
 API reference to Input()
-=======================
+========================
 
-.. automodule:: autoclasswrapper.Input
+Class definition
+----------------
+.. autoclass:: autoclasswrapper.Input
     :members:
