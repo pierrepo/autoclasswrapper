@@ -24,4 +24,6 @@ $ pipenv install autoclasswrapper
 
 ## Documentation
 
-Documentation is available [here](https://pierrepo.github.io/autoclasswrapper/)
+Documentation is available [here](https://autoclasswrapper.readthedocs.io/en/latest/)
+
+
