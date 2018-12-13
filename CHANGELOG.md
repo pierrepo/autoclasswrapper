@@ -1,5 +1,7 @@
 **Dev**
 - update missing dependencies in setup.cfg
+- improve PEP 8 and PEP 257 compliance
+- add documentation (Sphinx)
 
 **0.0.13**
 - print Exception content for check_data_type()
