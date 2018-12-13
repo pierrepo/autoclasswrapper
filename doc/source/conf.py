@@ -29,7 +29,7 @@ copyright = u'2018, Pierre Poulain'
 
 # The short X.Y.Z version.
 import autoclasswrapper
-version = autoclasswrapper.__version__[:5]
+version = autoclasswrapper.__version__
 # The full version, including alpha/beta/rc tags.
 release = autoclasswrapper.__version__
 
