@@ -1,4 +1,5 @@
 **Dev**
+**0.1.14**
 - update missing dependencies in setup.cfg
 - improve PEP 8 and PEP 257 compliance
 - add documentation (Sphinx)
