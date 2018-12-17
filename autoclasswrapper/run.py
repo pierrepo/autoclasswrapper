@@ -117,6 +117,12 @@ class Run():
             runfile.write("autoclass -reports "
                           "{0}.results-bin {0}.search {0}.r-params \n"
                           .format(self.root_name))
+            runfile.write("if [ $? -eq 0 ] \n")
+            runfile.write("then\n")
+            runfile.write("	touch autoclass-run-success\n")
+            runfile.write("else\n")
+            runfile.write("	touch autoclass-run-failure\n")
+            runfile.write("fi\n")
 
     @handle_error
     def create_run_file_test(self, time=60):
