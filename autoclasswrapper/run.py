@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 
 def search_autoclass_in_path():
-    """Search if autoclass-c executable is in PATH.
+    """Search if AutoClass C executable is in PATH.
 
     Returns
     -------
@@ -27,6 +27,23 @@ def search_autoclass_in_path():
     else:
         log.error("autoclass executable not found in path!")
     return autoclass_path
+
+
+def get_autoclass_version():
+    """Output AutoClass C version.
+
+    Returns
+    -------
+    version : str
+        Autoclass version
+
+    """
+    version = ""
+    if search_autoclass_in_path():
+        version = subprocess.check_output(["autoclass"])
+        version = version.decode("utf8").strip()
+        log.info("AutoClass C version: {}".format(version))
+    return version
 
 
 class Run():
@@ -142,18 +159,3 @@ class Run():
         run_name = self.root_name + ".sh"
         proc = subprocess.Popen(['nohup', 'bash', run_name, tag],
                                 env=os.environ)
-
-    @handle_error
-    def get_autoclass_version(self):
-        """Output autoclass version.
-
-        Returns
-        -------
-        version : str
-            Autoclass version
-
-        """
-        version = subprocess.check_output(["autoclass"])
-        version = version.decode("utf8").strip()
-        log.info("Autoclass version: {}".format(version))
-        return version

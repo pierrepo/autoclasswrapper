@@ -27,6 +27,12 @@ def test_search_autoclass_in_path(caplog, tmp_dir):
     wrapper.search_autoclass_in_path()
     assert "autoclass executable found in" in caplog.text
 
+
+def test_get_autoclass_version(caplog):
+    wrapper.get_autoclass_version()
+    assert "AUTOCLASS" in caplog.text
+
+
 class TestRunClass(object):
     """Test for the Run class
     """
@@ -39,8 +45,3 @@ class TestRunClass(object):
         run = wrapper.Run()
         run.create_run_file_test()
         assert os.path.isfile("clust.sh")
-
-    def test_get_version(self, caplog):
-        run = wrapper.Run()
-        run.get_autoclass_version()
-        assert "AUTOCLASS" in caplog.text
