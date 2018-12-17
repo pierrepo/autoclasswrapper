@@ -1,10 +1,15 @@
 **Dev**
+- Fix error decorator for Sphinx doc generation
+- Use 'class' (instead of 'cluster') for consistency
+- Move get_autoclass_version() out of Run() class
+- Create file marker upon autoclass run success/failure
+
 **0.1.14**
 - update missing dependencies in setup.cfg
 - improve PEP 8 and PEP 257 compliance
 - add documentation (Sphinx)
 
-**0.0.13**
+**0.1.13**
 - print Exception content for check_data_type()
 - output class probability for every gene/protein
 - simplify the calculation of cluster stats
