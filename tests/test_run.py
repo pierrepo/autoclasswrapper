@@ -18,21 +18,6 @@ def tmp_dir(tmpdir_factory):
     print("Tests are in: {}".format(str(tmpd)))
 
 
-def test_search_autoclass_in_path(caplog, tmp_dir):
-    # create fake autoclass binary add add it to PATH
-    autoclass_bin = "autoclass"
-    open(autoclass_bin, "a").close()
-    os.chmod(autoclass_bin, 766)
-    os.environ["PATH"] = os.getcwd() + ":" + os.environ["PATH"]
-    wrapper.search_autoclass_in_path()
-    assert "autoclass executable found in" in caplog.text
-
-
-def test_get_autoclass_version(caplog):
-    wrapper.get_autoclass_version()
-    assert "AUTOCLASS" in caplog.text
-
-
 class TestRunClass(object):
     """Test for the Run class
     """
