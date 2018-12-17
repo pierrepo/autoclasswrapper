@@ -23,7 +23,7 @@ compile:
 upload-to-pypi: compile
 	pipenv run twine upload dist/*
 	# clean compiled
-	rm -f dist/*.tar.gz dist/*.whl
+	rm -f dist/*.tar.gz dist/*.whl dist/*.egg
 
 autoclass: init
 	# https://ti.arc.nasa.gov/tech/rse/synthesis-projects-applications/autoclass/autoclass-c/
