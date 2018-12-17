@@ -34,8 +34,8 @@ class TestOutputClass(object):
 
     def test_init(self):
         res = wrapper.Output()
-        assert res.root_in_name == "clust"
-        assert res.root_out_name == "clust_out"
+        assert res.root_in_name == "autoclass"
+        assert res.root_out_name == "autoclass_out"
         assert res.tolerate_error == False
         assert res.case_number == 0
         assert res.class_number == 0
@@ -73,10 +73,10 @@ class TestOutputClass(object):
         res.extract_results()
         res.aggregate_input_data()
         res.write_cdt(with_proba=True)
-        assert os.path.isfile(res.root_out_name + "_withprobs.cdt")
-        ref_file = target_root_path + "_out_withprobs.cdt"
+        assert os.path.isfile(res.root_out_name + "_withproba.cdt")
+        ref_file = target_root_path + "_out_withproba.cdt"
         assert filecmp.cmp(ref_file,
-                           res.root_out_name + "_withprobs.cdt",
+                           res.root_out_name + "_withproba.cdt",
                            shallow=False)
 
     def test_write_dendrogram_no_stats(self, caplog, tmp_dir):

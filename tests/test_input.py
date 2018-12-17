@@ -102,7 +102,7 @@ class TestInputClass(object):
 
     def test_init(self, tmp_dir):
         clust = wrapper.Input()
-        assert clust.root_name == "clust"
+        assert clust.root_name == "autoclass"
         assert clust.db2_missing_char == "?"
         assert clust.db2_separator_char == "\t"
         assert clust.tolerate_error == False
@@ -140,8 +140,8 @@ class TestInputClass(object):
         clust.add_input_data(name3, "real scalar")
         clust.merge_dataframes()
         clust.create_db2_file()
-        assert os.path.isfile("clust.db2")
-        assert os.path.isfile("clust.tsv")
+        assert os.path.isfile("autoclass.db2")
+        assert os.path.isfile("autoclass.tsv")
 
     def test_create_hd2_file(self, caplog):
         clust = wrapper.Input()
@@ -153,7 +153,7 @@ class TestInputClass(object):
         clust.add_input_data(name3, "real scalar")
         clust.merge_dataframes()
         clust.create_hd2_file()
-        assert os.path.isfile("clust.hd2")
+        assert os.path.isfile("autoclass.hd2")
 
     def test_create_model_file(self, caplog):
         clust = wrapper.Input()
@@ -167,7 +167,7 @@ class TestInputClass(object):
         clust.add_input_data(name4, "real location")
         clust.merge_dataframes()
         clust.create_model_file()
-        assert os.path.isfile("clust.model")
+        assert os.path.isfile("autoclass.model")
 
     def test_create_sparams_file(self, caplog):
         clust = wrapper.Input()
@@ -175,7 +175,7 @@ class TestInputClass(object):
         clust.add_input_data(name, "real location")
         clust.merge_dataframes()
         clust.create_sparams_file()
-        assert os.path.isfile("clust.s-params")
+        assert os.path.isfile("autoclass.s-params")
 
     def test_create_sparams_file_repro_run(self, caplog):
         clust = wrapper.Input()
@@ -183,13 +183,13 @@ class TestInputClass(object):
         clust.add_input_data(name, "real location")
         clust.merge_dataframes()
         clust.create_sparams_file(reproducible_run=True)
-        assert os.path.isfile("clust.s-params")
-        f_content = open("clust.s-params", "r").read()
+        assert os.path.isfile("autoclass.s-params")
+        f_content = open("autoclass.s-params", "r").read()
         assert "randomize_random_p = false" in f_content
         assert 'start_fn_type = "block"' in f_content
 
     def test_create_rparams_file(self):
-        filename = "clust.r-params"
+        filename = "autoclass.r-params"
         clust = wrapper.Input()
         clust.create_rparams_file()
         assert os.path.isfile(filename)
@@ -212,7 +212,7 @@ class TestInputClass(object):
         clust.create_sparams_file()
         clust.create_rparams_file()
         content = clust.print_files()
-        assert "clust.hd2" in content
-        assert "clust.model" in content
-        assert "clust.s-params" in content
-        assert "clust.r-params" in content
+        assert "autoclass.hd2" in content
+        assert "autoclass.model" in content
+        assert "autoclass.s-params" in content
+        assert "autoclass.r-params" in content

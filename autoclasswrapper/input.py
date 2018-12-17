@@ -57,9 +57,10 @@ class Input():
 
     Parameters
     ----------
-    root_name : string (default "clust")
+    root_name : string (default "autoclass")
         Root name to generate input files for autoclass.
-        Example: "clust" will lead to "clust.db2", "clust.model"...
+        Example: "autoclass" will lead to "autoclass.db2",
+        "autoclass.model", "autoclass.s-params"...
     db2_separator_char : string (default: "\t")
         Character used to separate columns of data in autoclass db2 file.
     db2_missing_char : string (default: "?")
@@ -82,7 +83,7 @@ class Input():
     """
 
     def __init__(self,
-                 root_name="clust",
+                 root_name="autoclass",
                  db2_separator_char="\t",
                  db2_missing_char="?",
                  tolerate_error=False):

@@ -24,9 +24,9 @@ class TestRunClass(object):
     def test_create_run_file(self, caplog, tmp_dir):
         run = wrapper.Run()
         run.create_run_file()
-        assert os.path.isfile("clust.sh")
+        assert os.path.isfile("autoclass.sh")
 
     def test_create_run_file_test(self, caplog, tmp_dir):
         run = wrapper.Run()
         run.create_run_file_test()
-        assert os.path.isfile("clust.sh")
+        assert os.path.isfile("autoclass.sh")

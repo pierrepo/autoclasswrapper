@@ -8,6 +8,22 @@ import os
 import subprocess
 
 
+RUN_SCRIPT_CONTENT="""
+# the "y" parameter validates warning
+# in case of a reproducible run
+autoclass -search {0}.db2 {0}.hd2 {0}.model {0}.s-params <<EOF
+y
+EOF
+autoclass -reports {0}.results-bin {0}.search {0}.r-params
+
+if [ $? -eq 0 ]
+then
+	touch autoclass-run-success
+else
+	touch autoclass-run-failure
+fi
+"""
+
 log = logging.getLogger(__name__)
 
 
@@ -16,9 +32,10 @@ class Run():
 
     Parameters
     ----------
-    root_name : string (default "clust")
+    root_name : string (default "autoclass")
         Root name for input files and running script.
-        Example: "clust" will lead to "clust.db2", "clust.model", "clust.sh"...
+        Example: "autoclass" will lead to "autoclass.db2",
+        "autoclass.model", "autoclass.sh"...
     tolerate_error : bool (default: False)
         If True, countinue generation of autoclass input files even if an
         error is encounter.
@@ -33,7 +50,7 @@ class Run():
     """
 
     def __init__(self,
-                 root_name="clust",
+                 root_name="autoclass",
                  tolerate_error=False):
         """Instantiate object."""
         self.root_name = root_name
@@ -68,26 +85,13 @@ class Run():
 
     @handle_error
     def create_run_file(self):
-        """Create script that run autoclass."""
+        """Create bash script that runs AutoClass C."""
         log.info("Writing run file")
         run_name = self.root_name + ".sh"
         with open(run_name, "w") as runfile:
             # the "y" paramter is to validate warning
             # is case of for reproducible run
-            runfile.write("autoclass -search "
-                          "{0}.db2 {0}.hd2 {0}.model {0}.s-params <<EOF\n"
-                          "y\n"
-                          "EOF\n"
-                          .format(self.root_name))
-            runfile.write("autoclass -reports "
-                          "{0}.results-bin {0}.search {0}.r-params \n"
-                          .format(self.root_name))
-            runfile.write("if [ $? -eq 0 ] \n")
-            runfile.write("then\n")
-            runfile.write("	touch autoclass-run-success\n")
-            runfile.write("else\n")
-            runfile.write("	touch autoclass-run-failure\n")
-            runfile.write("fi\n")
+            runfile.write(RUN_SCRIPT_CONTENT.format(self.root_name))
 
     @handle_error
     def create_run_file_test(self, time=60):
