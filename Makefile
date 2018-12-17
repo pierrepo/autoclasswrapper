@@ -30,3 +30,7 @@ autoclass: init
 	wget https://ti.arc.nasa.gov/m/project/autoclass/autoclass-c-3-3-6.tar.gz
 	tar zxvf autoclass-c-3-3-6.tar.gz
 	rm -f autoclass-c-3-3-6.tar.gz
+
+
+doc:
+	cd doc && pipenv run make html

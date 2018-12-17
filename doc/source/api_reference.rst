@@ -9,3 +9,4 @@ This page provides documentation generated from the source files.
    ./pages/input
    ./pages/run
    ./pages/output
+   ./pages/tools

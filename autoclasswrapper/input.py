@@ -22,7 +22,7 @@ def raise_on_duplicates(input_list):
         List of column names.
 
     Raises
-    ----------
+    ------
     DuplicateColumnNameError : exception
         If there is a duplicated element in the input list.
 

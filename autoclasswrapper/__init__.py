@@ -11,7 +11,9 @@ from .input import (Input,
                     DuplicateColumnNameError,
                     CastFloat64Error)
 from .output import Output
-from .run import search_autoclass_in_path, get_autoclass_version, Run
+from .run import Run
+from .tools import search_autoclass_in_path, get_autoclass_version
+
 
 log = logging.getLogger(__name__)
 log_handler = logging.StreamHandler()
