@@ -1,4 +1,6 @@
 **Dev**
+
+**0.2.1**
 - Move function utilities to tools.py
 - Change defaut filename to 'autoclass'
 
