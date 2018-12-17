@@ -1,4 +1,6 @@
 **Dev**
+
+**0.2.0**
 - Fix error decorator for Sphinx doc generation
 - Use 'class' (instead of 'cluster') for consistency
 - Move get_autoclass_version() out of Run() class
