@@ -80,6 +80,8 @@ class Run():
                     for line in str(e).split('\n'):
                         log.error(line)
                     self.had_error = True
+        try_function.__name__ = f.__name__
+        try_function.__doc__ = f.__doc__
         return try_function
 
     @handle_error
