@@ -1,5 +1,6 @@
 **Dev**
 - Move function utilities to tools.py
+- Change defaut filename to 'autoclass'
 
 **0.2.0**
 - Fix error decorator for Sphinx doc generation
