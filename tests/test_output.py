@@ -91,7 +91,7 @@ class TestOutputClass(object):
         res = wrapper.Output(target_root_name)
         res.extract_results()
         res.aggregate_input_data()
-        res.write_cluster_stats()
+        res.write_class_stats()
         assert os.path.isfile(res.root_out_name + "_stats.tsv")
         ref_file = target_root_path + "_out_stats.tsv"
         assert filecmp.cmp(ref_file,
@@ -111,7 +111,7 @@ class TestOutputClass(object):
         res.aggregate_input_data()
         res.write_cdt()
         res.write_cdt(with_proba=True)
-        res.write_cluster_stats()
+        res.write_class_stats()
         res.write_dendrogram()
         zipname = res.wrap_outputs()
         assert os.path.isfile(zipname)

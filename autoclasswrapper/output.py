@@ -122,9 +122,9 @@ class Output():
             self.class_number = len(classes)
         log.info("Found {} cases classified in {} classes"
                  .format(self.case_number, self.class_number))
-        columns = ["main-class", "main-prob"]
+        columns = ["main-class", "main-class-proba"]
         for i in range(self.class_number):
-            columns.append("prob-class-{}".format(i+1))
+            columns.append("class-{}-proba".format(i+1))
         self.stats = pd.DataFrame(0.0,
                                   index=np.arange(1, self.case_number+1),
                                   columns=columns)
@@ -146,8 +146,8 @@ class Output():
                     proba = float(items[idx+1])
                     if idx == 1:
                         self.stats.loc[case, "main-class"] = class_id
-                        self.stats.loc[case, "main-prob"] = proba
-                    label = "prob-class-{}".format(class_id)
+                        self.stats.loc[case, "main-class-proba"] = proba
+                    label = "class-{}-proba".format(class_id)
                     self.stats.loc[case, label] = proba
         # cast class id to int
         self.stats["main-class"] = self.stats["main-class"].astype(int)
@@ -167,7 +167,7 @@ class Output():
         self.stats.index = self.df.index
         self.df = pd.concat([self.df, self.stats], axis=1)
         # prepare data for export
-        log.info("Writing clust + probs .tsv file")
+        log.info("Writing classes + probabilities .tsv file")
         self.df.to_csv(self.root_out_name + ".tsv",
                        sep="\t",
                        header=True,
@@ -188,7 +188,7 @@ class Output():
             log.info("Writing .cdt file")
             filename = self.root_out_name + ".cdt"
         else:
-            log.info("Writing .cdt file (with probs)")
+            log.info("Writing .cdt file (with probabilities)")
             filename = self.root_out_name + "_withprobs.cdt"
         # add GWEIGHT
         df_tmp["gweight"] = 1
@@ -202,7 +202,7 @@ class Output():
                                                       x["main-class"]),
             axis=1)
         # sort by increasing class
-        df_tmp.sort_values(by=["main-class", "main-prob"],
+        df_tmp.sort_values(by=["main-class", "main-class-proba"],
                            ascending=[True, False],
                            inplace=True)
         with open(filename, "w") as cdtfile:
@@ -210,7 +210,7 @@ class Output():
             headers = ["GID", "UNIQID", "NAME", "GWEIGHT"]
             headers += self.experiment_names
             if with_proba:
-                headers += ["probability-class-{}"
+                headers += ["class-{}-proba"
                             .format(i+1) for i in range(self.class_number)]
             cdtfile.write("{}\n".format("\t".join(headers)))
             # write 'EWEIGHT' line
@@ -222,7 +222,7 @@ class Output():
             col_names = ["gid", "name1", "name2", "gweight"]
             col_names += self.experiment_names
             if with_proba:
-                col_names += ["prob-class-{}"
+                col_names += ["class-{}-proba"
                               .format(i+1) for i in range(self.class_number)]
             for class_idx in range(1, self.class_number+1):
                 cluster = df_tmp[df_tmp["main-class"] == class_idx]
@@ -237,13 +237,13 @@ class Output():
                                   .format(dummy, class_idx))
 
     @handle_error
-    def write_cluster_stats(self):
-        """Write cluster stat file.
+    def write_class_stats(self):
+        """Write class stat file.
 
         Number of elements per class.
         Mean and standard deviation values per experiment.
         """
-        log.info("Writing cluster stats")
+        log.info("Writing class statistics")
         stat_name = self.root_out_name + "_stats.tsv"
         df_tmp = self.df[["main-class"] + self.experiment_names]
         # compute metrics
@@ -256,9 +256,9 @@ class Output():
         # concat
         df_stats = pd.concat([df_count, df_mean, df_std], axis=0, join="inner")
         # add cluster
-        df_stats["cluster"] = df_stats.index
+        df_stats["class"] = df_stats.index
         # sort by cluster and metric
-        df_stats.sort_values(by=["cluster", "stat"], inplace=True)
+        df_stats.sort_values(by=["class", "stat"], inplace=True)
         # save file with ordered columns
         col = list(df_stats.columns)
         df_stats = df_stats[[col[-1], col[-2], *col[:-2]]]
@@ -278,13 +278,13 @@ class Output():
         # remove NA
         df.dropna(inplace=True)
         # keep cluster labels
-        labels = df["cluster"]
+        labels = df["class"]
         # remove unwanted columns
-        df.drop(labels=["stat", "cluster"], axis=1, inplace=True)
+        df.drop(labels=["stat", "class"], axis=1, inplace=True)
         Z = hierarchy.linkage(df, 'ward')
         plt.figure(figsize=(10, 6))
         plt.title('Hierarchical Clustering Dendrogram')
-        plt.xlabel('Cluster #')
+        plt.xlabel('Class #')
         plt.ylabel('Distance')
         hierarchy.dendrogram(
             Z,
