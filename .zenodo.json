@@ -1,0 +1,17 @@
+{
+    "title": "autoclasswrapper (v0.2.1): A Python wrapper for AutoClass C classification",
+    "creators": [{
+        "name": "Poulain, Pierre",
+        "orcid": "0000-0003-4177-3619"
+    }],
+    "description": "This repository contains the archived release for the software autoclasswrapper",
+    "access_right": "open",
+    "license": "bsd-3-clause",
+    "keywords": [
+        "Omics",
+        "Proteomics",
+        "Genomics",
+        "Python"
+    ],
+    "upload_type": "software"
+}
