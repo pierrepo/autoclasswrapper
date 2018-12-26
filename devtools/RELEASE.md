@@ -54,3 +54,8 @@ On [GitHub release page](https://github.com/pierrepo/autoclasswrapper/releases) 
 - Add release version as *Release title* (e.g.: v1.3.7).
 - Copy and paste the content of the `CHANGELOG.md` in the *Describe this release* field.
 - Hit the *Publish Release* button.
+
+
+### Zenodo integration
+
+After the creation  of the new release in GitHub, check the archive has been creating on [Zenodo](https://zenodo.org/deposit).
