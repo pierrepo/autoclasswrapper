@@ -1,4 +1,5 @@
 **Dev**
+- Remove wrap method for results
 
 **0.2.1**
 - Move function utilities to tools.py

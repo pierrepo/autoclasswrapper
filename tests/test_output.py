@@ -104,14 +104,3 @@ class TestOutputClass(object):
         res.aggregate_input_data()
         res.write_dendrogram()
         assert os.path.isfile(res.root_out_name + "_dendrogram.png")
-
-    def test_wrap_outputs(self, caplog, tmp_dir):
-        res = wrapper.Output(target_root_name)
-        res.extract_results()
-        res.aggregate_input_data()
-        res.write_cdt()
-        res.write_cdt(with_proba=True)
-        res.write_class_stats()
-        res.write_dendrogram()
-        zipname = res.wrap_outputs()
-        assert os.path.isfile(zipname)

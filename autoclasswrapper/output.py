@@ -294,24 +294,3 @@ class Output():
             above_threshold_color='grey',
             labels=["{:.0f}".format(clust) for clust in labels])
         plt.savefig(self.root_out_name + "_dendrogram.png")
-
-    @handle_error
-    def wrap_outputs(self):
-        """Wrap results into a zipped file.
-
-        Returns
-        -------
-        zipname : string
-            Name of the zip file that contains output files
-
-        """
-        t = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        zipname = "{}-autoclass-clust.zip".format(t)
-        with zipfile.ZipFile(zipname, "w") as outputzip:
-            for extension in (".tsv", ".cdt", "_withproba.cdt",
-                              "_stats.tsv", "_dendrogram.png"):
-                filename = self.root_out_name + extension
-                if os.path.exists(filename):
-                    outputzip.write(filename)
-                    log.info("{} added to zip file".format(filename))
-        return zipname
