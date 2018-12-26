@@ -1,4 +1,6 @@
 **Dev**
+
+**1.0.0**
 - Jump to major release
 
 **0.2.2**
