@@ -1,5 +1,6 @@
 **Dev**
 - Remove wrap method for results
+- Update list of athorized characters in column names
 
 **0.2.1**
 - Move function utilities to tools.py

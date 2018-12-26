@@ -421,7 +421,7 @@ class Dataset():
     separator_char : string (defaut: "\t")
         Character used to separate columns of data in input file.
     df : Pandas dataframe (default: None)
-        All data are stored in a Pandas dataframe
+        Pandas dataframe that contains all data.
     column_meta : dict (default: {})
         Dictionnary that contains metadata for each column.
         Keys are column names.
@@ -504,9 +504,20 @@ class Dataset():
     def clean_column_names(self):
         """Clean column names.
 
-        Replace unwanted characters by '_'
+        Allowed characters are:
+
+        - `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+        - `abcdefghijklmnopqrstuvwxyz`
+        - `0123456789`
+        - `.` (dot)
+        - `+` (plus signe)
+        - `-` (minus signe)
+        - `_` (underscore)
+
+        Unauthorized characters are replaced by '_'
         """
-        regex = re.compile('[^A-Za-z0-9 ._+-]+')
+        #regex = re.compile('[^A-Za-z0-9 ._+-]+')
+        regex = re.compile('[^A-Za-z0-9._+-]+')
         log.debug("Checking column names")
         # check index column name first
         col_name = self.df.index.name
