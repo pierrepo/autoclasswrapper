@@ -1,4 +1,4 @@
-"""autoclasswrapper: Python wrapper for AutoClass clustering.
+"""autoclasswrapper: Python wrapper for AutoClass C classification.
 
 Prepare output files and results
 """

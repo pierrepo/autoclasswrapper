@@ -1,4 +1,4 @@
-"""autoclasswrapper: Python wrapper for AutoClass clustering.
+"""autoclasswrapper: Python wrapper for AutoClass C classification.
 
 Create run script and run classification
 """
@@ -120,7 +120,7 @@ class Run():
 
     @handle_error
     def run(self, tag=""):
-        """Run autoclass clustering.
+        """Run AutoClass C classification.
 
         autoclass-c executable must be in PATH!
 

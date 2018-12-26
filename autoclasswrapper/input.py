@@ -1,4 +1,4 @@
-"""autoclasswrapper: Python wrapper for AutoClass clustering.
+"""autoclasswrapper: Python wrapper for AutoClass C classification.
 
 Input files and parameters
 """
@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 
 def raise_on_duplicates(input_list):
-    """Verify if a list as duplicated values.
+    """Verify duplicated values in a list.
 
     Parameters
     ----------
@@ -28,12 +28,10 @@ def raise_on_duplicates(input_list):
 
     """
     if len(input_list) != len(set(input_list)):
-        col_names = ["'{}'".format(name) for name in input_list]
-        raise DuplicateColumnNameError(
-            ("Found duplicate column names:\n"
-             "{}\n"
-             "Please clean your header"
-             ).format(" ".join(col_names)))
+        col_names = " ".join(["'{}'".format(name) for name in input_list])
+        raise DuplicateColumnNameError(("Found duplicate column names:\n"
+                                        "{}\nPlease clean your header"
+                                        ).format(col_names))
 
 
 class DuplicateColumnNameError(Exception):
@@ -47,38 +45,40 @@ class DuplicateColumnNameError(Exception):
 class CastFloat64Error(Exception):
     """Exception raised when data column cannot be casted to float64 type."""
 
-    def __init__(self, message):
+    def __init__(self, col, e):
         """Instantiate object."""
-        self.message = message
+        self.message = ("Cannot cast column '{}' to float\n"
+                        "{}\nCheck your input file!"
+                        ).format(col, str(e))
 
 
 class Input():
-    r"""Autoclass input files and parameters.
+    r"""AutoClass C input files and parameters.
 
     Parameters
     ----------
     root_name : string (default "autoclass")
-        Root name to generate input files for autoclass.
+        Root name to generate input files for AutoClass C.
         Example: "autoclass" will lead to "autoclass.db2",
         "autoclass.model", "autoclass.s-params"...
     db2_separator_char : string (default: "\t")
-        Character used to separate columns of data in autoclass db2 file.
+        Character used to separate columns of data in AutoClass C db2 file.
     db2_missing_char : string (default: "?")
-        Character used to encode missing data in autoclass db2 file.
+        Character used to encode missing data in AutoClass C db2 file.
     tolerate_error : bool (default: False)
-        If True, countinue generation of autoclass input files even if an
+        If True, countinue generation of AutoClass C input files even if an
         error is encounter.
         If False, stop at first error.
 
     Attributes
     ----------
     had_error : bool (defaut False)
-        Set to True if an error has been found in the generation of autoclass
+        Set to True if an error has been found in the generation of AutoClass C
         input files.
     input_datasets : list of Dataset() objects
         List of all input Datasets.
     full_dataset : Dataset() object
-        Final Dataset used by autoclass.
+        Final Dataset used by AutoClass C.
 
     """
 
@@ -190,7 +190,7 @@ class Input():
 
     @handle_error
     def create_db2_file(self):
-        """Create .db2 file (data).
+        """Create .db2 file (AutoClass C data).
 
         Also save all data into a .tsv file for later user.
         """
@@ -211,7 +211,7 @@ class Input():
 
     @handle_error
     def create_hd2_file(self):
-        """Create .hd2 file (Autoclass data descriptions)."""
+        """Create .hd2 file (AutoClass C data descriptions)."""
         log.info("Writing .hd2 file")
         hd2_name = self.root_name + ".hd2"
         column_names = self.full_dataset.df.columns
@@ -252,7 +252,7 @@ class Input():
 
     @handle_error
     def create_model_file(self):
-        """Create .model file (Autoclass data models).
+        """Create .model file (AutoClass C data models).
 
         Choice of model based on data type and missing values
         """
@@ -302,43 +302,46 @@ class Input():
                             start_j_list=[2, 3, 5, 7, 10, 15, 25, 35,
                                           45, 55, 65, 75, 85, 95, 105],
                             reproducible_run=False):
-        """Create .s-params file (Autoclass search parameters).
+        """Create .s-params file (AutoClass C search parameters).
 
         Parameters
         ----------
         max_duration : int (default: 3600)
-            Maximum time (in seconds) for the autoclass simulation.
+            Maximum time (in seconds) for the AutoClass C simulation.
             If set max_duration = 0, simulation will run with NO time limit
-            For more details, see autoclass documentation:
+            For more details, see AutoClass C documentation:
             file search-c.text, lines 493-495
         max_n_tries : int (default: 200)
             Number of trials to run.
-            For more details, see autoclass documentation:
+            For more details, see AutoClass C documentation:
             file search-c.text, lines 403-404
         max_cycles : int (default: 1000)
             Max number of cycles per trial.
             This is maximum that may not be reached.
-            For more details, see autoclass documentation:
+            For more details, see AutoClass C documentation:
             file search-c.text, lines 316-317
         start_j_list : list of int (default: [2, 3, 5, 7, 10, 15, 25, 35,
                                              45, 55, 65, 75, 85, 95, 105])
             Initial guesses of the number of clusters
             Autoclass default: 2, 3, 5, 7, 10, 15, 25
-            For more details, see autoclass documentation:
+            For more details, see AutoClass C documentation:
             file search-c.text, line 332
         reproducible_run : boolean (default: False)
             If set to True, define parameters to obtain reproducible run.
             This parameters are considered "for testing *only*" by autoclass-c
             and should NOT be used for production run.
-            The following autoclass-c parameters are set:
+            The following AutoClass C parameters are set:
+
             - randomize_random_p = false
                 Random seed is set to 1 (instead of the usual current time)
             - start_fn_type = "block"
                 Instead of "random"
+
             For more details, see autoclass documentation:
-            file search-c.text, line 678
-            file search-c.text, line 565
-            file search-c.text, line 525
+
+            - file search-c.text, line 678
+            - file search-c.text, line 565
+            - file search-c.text, line 525
 
         """
         log.info("Writing .s-params file")
@@ -358,7 +361,7 @@ class Input():
 
     @handle_error
     def create_rparams_file(self):
-        """Create .r-params file (Autoclass report parameters)."""
+        """Create .r-params file (AutoClass C report parameters)."""
         log.info("Writing .r-params file")
         rparams_name = self.root_name + ".r-params"
         with open(rparams_name, "w") as rparams:
@@ -376,7 +379,7 @@ class Input():
         Returns
         -------
         content : string
-            Contain all autoclass parameter files concatenated.
+            Contain all AutoClass C parameter files concatenated.
 
         """
         content = ""
@@ -433,7 +436,7 @@ class Dataset():
                  error=None,
                  separator_char="\t",
                  missing_char=""):
-        """Object instantiation."""
+        """Instantiate object."""
         self.input_file = input_file
         self.data_type = data_type
         self.error = error
@@ -542,12 +545,7 @@ class Dataset():
                                             .to_string())
                              )
                 except Exception as e:
-                    raise CastFloat64Error(("Cannot cast column '{}' "
-                                            "to float\n"
-                                            "{}\n"
-                                            "Check your input file!"
-                                            ).format(col, str(e))
-                                           )
+                    raise CastFloat64Error(col, e)
             if self.column_meta[col]['type'] == "discrete":
                 log.info("Column '{}': {} different values"
                          .format(col, self.df[col].nunique())
