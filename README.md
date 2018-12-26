@@ -1,4 +1,4 @@
-# Python wrapper for AutoClass clustering
+# Python wrapper for AutoClass C classification
 
 [![License: BSD](https://img.shields.io/badge/License-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)   [![autoclasswrapper version on PyPI](https://badge.fury.io/py/autoclasswrapper.svg)](https://pypi.python.org/pypi/autoclasswrapper)   [![Build Status](https://travis-ci.org/pierrepo/autoclasswrapper.svg?branch=master)](https://travis-ci.org/pierrepo/autoclasswrapper)
 [![Documentation Status](https://readthedocs.org/projects/autoclasswrapper/badge/?version=latest)](https://autoclasswrapper.readthedocs.io/en/latest/?badge=latest)
@@ -25,5 +25,3 @@ $ pipenv install autoclasswrapper
 ## Documentation
 
 Documentation is available [here](https://autoclasswrapper.readthedocs.io/en/latest/)
-
-

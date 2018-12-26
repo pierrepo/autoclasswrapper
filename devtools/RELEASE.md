@@ -8,6 +8,8 @@ Install required packages:
 $ pipenv install --dev twine bumpversion
 ```
 
+For Zenodo integration, see [Making Your Code Citable](https://guides.github.com/activities/citable-code/).
+
 
 ## Tests
 

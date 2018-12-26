@@ -1,4 +1,5 @@
 **Dev**
+- Jump to major release
 
 **0.2.2**
 - Remove wrap method for results
