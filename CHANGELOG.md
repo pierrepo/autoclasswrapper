@@ -1,4 +1,6 @@
 **Dev**
+
+**0.2.2**
 - Remove wrap method for results
 - Update list of athorized characters in column names
 
