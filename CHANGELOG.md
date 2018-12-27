@@ -1,4 +1,6 @@
 **Dev**
+
+**1.1.0**
 - Rewrite write_dendrogram() method
 - Rename marker files (autoclass_run_*) in snake_case
 
