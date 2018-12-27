@@ -1,4 +1,6 @@
 **Dev**
+
+**1.2.0**
 - Handle error while checking for autoclass version
 - Fix missing margin in dendrogram picture
 
