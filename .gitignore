@@ -13,10 +13,9 @@ __pycache__/
 lab/
 
 # demo
-demo/clust.*
+demo/autoclass*
 demo/nohup.out
-demo/clust_out*
-
+demo/*.tsv
 
 # Python package builds
 autoclasswrapper.egg-info/
