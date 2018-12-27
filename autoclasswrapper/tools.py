@@ -37,8 +37,13 @@ def get_autoclass_version():
 
     """
     version = ""
-    if search_autoclass_in_path():
+    if not search_autoclass_in_path():
+        return version
+    try:
         version = subprocess.check_output(["autoclass"])
         version = version.decode("utf8").strip()
         log.info("AutoClass C version: {}".format(version))
-    return version
+    except:
+        log.error("AutoClass C is in PATH but is not executable")
+    finally:
+        return version

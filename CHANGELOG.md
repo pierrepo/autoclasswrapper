@@ -1,4 +1,5 @@
 **Dev**
+- Handle error while checking for autoclass version
 
 **1.1.0**
 - Rewrite write_dendrogram() method
