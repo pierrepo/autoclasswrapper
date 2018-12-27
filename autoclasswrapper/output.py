@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 class Output():
-    """Autoclass output files and results.
+    """AutoClass output files and results.
 
     Parameters
     ----------
@@ -275,22 +275,35 @@ class Output():
             log.error("Cannot find {}".format(stat_name))
             return 0
         df = pd.read_csv(stat_name, sep="\t")
-        # keep only 'mean'
-        df = df[df["stat"] == "mean"]
-        # remove NA
-        df.dropna(inplace=True)
-        # keep cluster labels
-        labels = df["class"]
-        # remove unwanted columns
-        df.drop(labels=["stat", "class"], axis=1, inplace=True)
-        Z = hierarchy.linkage(df, 'ward')
+        # keep cluster labels and counts
+        class_names_values = {val[0]:val[1]
+                              for val
+                              in df[df["stat"] == "count"][["class", df.columns[-1]]].values
+                              }
+        # prepare dataframe:
+        # 1. isolate 'mean' values
+        # 2. remove NA
+        # 3. keep only columns with values
+        df_clean = (df.query("stat == 'mean'")
+                      .dropna()
+                      .drop(labels=["stat", "class"], axis=1)
+        )
+        Z = hierarchy.linkage(df_clean, 'ward')
+        plt.rcParams['lines.linewidth'] = 2.5
+        plt.rcParams['font.size'] = 16
+        plt.rcParams['xtick.labelsize'] = 14
         plt.figure(figsize=(10, 6))
-        plt.title('Hierarchical Clustering Dendrogram')
-        plt.xlabel('Class #')
+        plt.title('Hierarchical Clustering of Classes')
+        plt.xlabel('Classes')
         plt.ylabel('Distance')
         hierarchy.dendrogram(
             Z,
             color_threshold=0.0,
+            leaf_font_size=12,
+            leaf_rotation=90,
             above_threshold_color='grey',
-            labels=["{:.0f}".format(clust) for clust in labels])
+            labels=["{:.0f} [{:.0f}]".format(name, value)
+                    for name, value in class_names_values.items()
+                    ]
+        )
         plt.savefig(self.root_out_name + "_dendrogram.png")
