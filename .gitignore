@@ -9,6 +9,8 @@ __pycache__/
 .pytest_cache/
 .coverage
 
+# lab / dev tests
+lab/
 
 # demo
 demo/clust.*
