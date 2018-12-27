@@ -1,5 +1,6 @@
 **Dev**
 - Handle error while checking for autoclass version
+- Fix missing margin in dendrogram picture
 
 **1.1.0**
 - Rewrite write_dendrogram() method

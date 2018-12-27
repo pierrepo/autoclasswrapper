@@ -288,22 +288,23 @@ class Output():
                       .dropna()
                       .drop(labels=["stat", "class"], axis=1)
         )
-        Z = hierarchy.linkage(df_clean, 'ward')
-        plt.rcParams['lines.linewidth'] = 2.5
-        plt.rcParams['font.size'] = 16
-        plt.rcParams['xtick.labelsize'] = 14
+        Z = hierarchy.linkage(df_clean, "ward")
+        plt.rcParams["lines.linewidth"] = 2.5
+        plt.rcParams["font.size"] = 16
+        plt.rcParams["xtick.labelsize"] = 14
         plt.figure(figsize=(10, 6))
-        plt.title('Hierarchical Clustering of Classes')
-        plt.xlabel('Classes')
-        plt.ylabel('Distance')
+        plt.title("Hierarchical Clustering of Classes")
+        plt.xlabel("Classes")
+        plt.ylabel("Distance")
         hierarchy.dendrogram(
             Z,
             color_threshold=0.0,
             leaf_font_size=12,
             leaf_rotation=90,
-            above_threshold_color='grey',
+            above_threshold_color="grey",
             labels=["{:.0f} [{:.0f}]".format(name, value)
                     for name, value in class_names_values.items()
                     ]
         )
-        plt.savefig(self.root_out_name + "_dendrogram.png")
+        plt.savefig(self.root_out_name + "_dendrogram.png",
+                    bbox_inches="tight")
