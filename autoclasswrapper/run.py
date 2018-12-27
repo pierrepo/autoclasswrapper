@@ -18,9 +18,9 @@ autoclass -reports {0}.results-bin {0}.search {0}.r-params
 
 if [ $? -eq 0 ]
 then
-	touch autoclass-run-success
+	touch autoclass_run_success
 else
-	touch autoclass-run-failure
+	touch autoclass_run_failure
 fi
 """
 

@@ -1,11 +1,13 @@
 **Dev**
+- Rewrite write_dendrogram() method
+- Rename marker files (autoclass_run_*) in snake_case
 
 **1.0.0**
 - Jump to major release
 
 **0.2.2**
 - Remove wrap method for results
-- Update list of athorized characters in column names
+- Update list of authorized characters in column names
 
 **0.2.1**
 - Move function utilities to tools.py
