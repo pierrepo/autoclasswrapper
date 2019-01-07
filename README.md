@@ -18,7 +18,7 @@ autoclasswrapper is a Python wrapper to ease the use of Autoclass C.
 Dependencies:
 
 - **Python 3.6** or above
-- Python libraries: NumPy, Pandas, scipy, matplotlib, chardet
+- Python libraries: NumPy, Pandas, Scipy, matplotlib, chardet
 
 autoclasswrapper is available through the Python Package Index ([PyPI](https://pypi.org/)):
 
@@ -40,3 +40,14 @@ Documentation is available on [ReadTheDocs](https://autoclasswrapper.readthedocs
 ## License
 
 autoclasswrapper is free software made available under the BSD 3-clause license. For more details see the [LICENSE](LICENSE.txt) file.
+
+
+## Contributing
+
+If you want to report a bug, request a feature, or propose an improvement use the [GitHub issue system](https://github.com/pierrepo/autoclasswrapper/issues/).
+
+Please, see also the [CONTRIBUTING](CONTRIBUTING.md) file.
+
+Note that this project is released with a [Contributor Code of
+Conduct](http://contributor-covenant.org/). By participating in this project you
+agree to abide by its terms. See the [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md) file.
