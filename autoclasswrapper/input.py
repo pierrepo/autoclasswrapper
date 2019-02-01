@@ -29,9 +29,10 @@ def raise_on_duplicates(input_list):
     """
     if len(input_list) != len(set(input_list)):
         col_names = " ".join(["'{}'".format(name) for name in input_list])
-        raise DuplicateColumnNameError(("Found duplicate column names:\n"
-                                        "{}\nPlease clean your header"
-                                        ).format(col_names))
+        raise DuplicateColumnNameError(
+            ("Found duplicate column names:\n"
+             f"{col_names}\nPlease clean your header"
+            ))
 
 
 class DuplicateColumnNameError(Exception):
@@ -47,9 +48,8 @@ class CastFloat64Error(Exception):
 
     def __init__(self, col, e):
         """Instantiate object."""
-        self.message = ("Cannot cast column '{}' to float\n"
-                        "{}\nCheck your input file!"
-                        ).format(col, str(e))
+        self.message = (f"Cannot cast column '{col}' to float\n"
+                        f"{str(e)}\nCheck your input file!")
 
 
 class Input():
@@ -184,8 +184,7 @@ class Input():
         raise_on_duplicates(self.full_dataset.df.columns)
 
         nrows, ncols = self.full_dataset.df.shape
-        log.info("Final dataframe has {} lines and {} columns"
-                 .format(nrows, ncols+1))
+        log.info(f"Final dataframe has {nrows} lines and {ncols+1} columns")
         self.full_dataset.search_missing_values()
 
     @handle_error
@@ -196,14 +195,14 @@ class Input():
         """
         db2_name = self.root_name + ".db2"
         tsv_name = self.root_name + ".tsv"
-        log.info("Writing {} file".format(db2_name))
-        log.info("If any, missing values will be encoded as '{}'"
-                 .format(self.db2_missing_char))
+        log.info(f"Writing {db2_name} file")
+        log.info("If any, missing values will be encoded"
+                f" as '{self.db2_missing_char}'")
         self.full_dataset.df.to_csv(db2_name,
                                     header=False,
                                     sep=self.db2_separator_char,
                                     na_rep=self.db2_missing_char)
-        log.debug("Writing {} file [for later use]".format(tsv_name))
+        log.debug(f"Writing {tsv_name} file [for later use]")
         self.full_dataset.df.to_csv(tsv_name,
                                     header=True,
                                     sep="\t",
@@ -216,38 +215,30 @@ class Input():
         hd2_name = self.root_name + ".hd2"
         column_names = self.full_dataset.df.columns
         with open(hd2_name, "w") as hd2:
-            hd2.write("num_db2_format_defs {}\n".format(2))
+            hd2.write("num_db2_format_defs 2\n")
             hd2.write("\n")
             # get number of columns + index
-            hd2.write("number_of_attributes {}\n".format(len(column_names)+1))
-            hd2.write("separator_char '{}'\n".format(self.db2_separator_char))
+            hd2.write(f"number_of_attributes {len(column_names)+1}\n")
+            hd2.write(f"separator_char '{self.db2_separator_char}'\n")
             hd2.write("\n")
             # write first columns (protein/gene names)
-            hd2.write('0 dummy nil "{}"\n'
-                      .format(self.full_dataset.df.index.name))
+            hd2.write(f'0 dummy nil "{self.full_dataset.df.index.name}"\n')
             for idx, name in enumerate(column_names):
                 meta = self.full_dataset.column_meta[name]
                 if meta["type"] == "real scalar":
                     # by default minimum value is set to 0.0
                     assert self.full_dataset.df.min()[idx] >= 0.0, \
-                           "min value for {} shoud be >= 0.0".format(name)
-                    hd2.write(('{} real scalar "{}" '
-                               'zero_point 0.0 rel_error {}\n')
-                              .format(idx+1,
-                                      name,
-                                      meta["error"])
+                           f"min value for {name} shoud be >= 0.0"
+                    hd2.write(f'{idx+1} real scalar "{name}" '
+                              f'zero_point 0.0 rel_error {meta["error"]}\n'
                               )
                 if meta["type"] == "real location":
-                    hd2.write('{} real location "{}" error {}\n'
-                              .format(idx+1,
-                                      name,
-                                      meta["error"])
+                    hd2.write(f'{idx+1} real location "{name}" '
+                              f'error {meta["error"]}\n'
                               )
                 if meta["type"] == "discrete":
-                    hd2.write('{} discrete nominal "{}" range {}\n'
-                              .format(idx+1,
-                                      name,
-                                      self.full_dataset.df[name].nunique())
+                    hd2.write(f'{idx+1} discrete nominal "{name}" '
+                              f'range {self.full_dataset.df[name].nunique()}\n'
                               )
 
     @handle_error
@@ -282,17 +273,17 @@ class Input():
                 models_count += 1
         # write model file
         with open(model_name, "w") as model:
-            model.write("model_index 0 {}\n".format(models_count))
+            model.write(f"model_index 0 {models_count}\n")
             model.write("ignore 0\n")
             if real_values_normals:
-                model.write("single_normal_cn {}\n"
-                            .format(" ".join(real_values_normals)))
+                model.write("single_normal_cn "
+                            f"{' '.join(real_values_normals)}\n")
             if real_values_missing:
-                model.write("single_normal_cm {}\n"
-                            .format(" ".join(real_values_missing)))
+                model.write("single_normal_cm "
+                            f"{' '.join(real_values_missing)}\n")
             if multinomial_values:
-                model.write("single_multinomial {}\n"
-                            .format(" ".join(multinomial_values)))
+                model.write("single_multinomial "
+                            f"{' '.join(multinomial_values)}\n")
 
     @handle_error
     def create_sparams_file(self,
@@ -350,11 +341,11 @@ class Input():
             sparams.write("screen_output_p = false \n")
             sparams.write("break_on_warnings_p = false \n")
             sparams.write("force_new_search_p = true \n")
-            sparams.write("max_duration = {}\n".format(max_duration))
-            sparams.write("max_n_tries = {}\n".format(max_n_tries))
-            sparams.write("max_cycles = {}\n".format(max_cycles))
+            sparams.write(f"max_duration = {max_duration}\n")
+            sparams.write(f"max_n_tries = {max_n_tries}\n")
+            sparams.write(f"max_cycles = {max_cycles}\n")
             starters = [str(j) for j in start_j_list]
-            sparams.write("start_j_list = {}\n".format(", ".join(starters)))
+            sparams.write(f"start_j_list = {', '.join(starters)}\n")
             if reproducible_run is True:
                 sparams.write("randomize_random_p = false\n")
                 sparams.write('start_fn_type = "block"\n')
@@ -476,16 +467,16 @@ class Dataset():
         Header must be on the first row (header=0)
         Gene/protein/orf names must be on the first column (index_col=0)
         """
-        msg = "Reading data file '{}' as '{}'".format(self.input_file,
-                                                      self.data_type)
+        msg = (f"Reading data file '{self.input_file}' "
+               f"as '{self.data_type}'")
         if self.data_type in ['real scalar', 'real location']:
-            msg += " with error {}".format(self.error)
+            msg += f" with error {self.error}"
         log.info(msg)
         # check for duplicate column names
         self.check_duplicate_col_names()
         # find encoding
         encoding = self.guess_encoding()
-        log.info("Detected encoding: {}".format(encoding))
+        log.info(f"Detected encoding: {encoding}")
         # load data
         self.df = pd.read_table(self.input_file,
                                 sep=self.separator_char,
@@ -499,7 +490,7 @@ class Dataset():
                     "error": self.error,
                     "missing": False}
             self.column_meta[col] = meta
-        log.info("Found {} rows and {} columns".format(nrows, ncols+1))
+        log.info(f"Found {nrows} rows and {ncols+1} columns")
 
     def clean_column_names(self):
         """Clean column names.
@@ -524,15 +515,13 @@ class Dataset():
         col_name_new = regex.sub("_", col_name)
         if col_name_new != col_name:
             self.df.index.name = col_name_new
-            log.warning("Column '{}' renamed to '{}'"
-                        .format(col_name, col_name_new))
+            log.warning(f"Column '{col_name}' renamed to '{col_name_new}'")
         # then other column names
         for col_name in self.df.columns:
             col_name_new = regex.sub("_", col_name)
             if col_name_new != col_name:
                 self.df.rename(columns={col_name: col_name_new}, inplace=True)
-                log.warning("Column '{}' renamed to '{}'"
-                            .format(col_name, col_name_new))
+                log.warning(f"Column '{col_name}' renamed to '{col_name_new}'")
                 # update column meta data
                 self.column_meta[col_name_new] = self.column_meta.pop(col_name)
         # print all columns names
@@ -551,15 +540,15 @@ class Dataset():
                                                  'real location']:
                 try:
                     self.df[col].astype('float64')
-                    log.info("Column '{}'\n".format(col)
+                    log.info(f"Column '{col}'\n"
                              + (self.df[col].describe(percentiles=[])
                                             .to_string())
                              )
                 except Exception as e:
                     raise CastFloat64Error(col, e)
             if self.column_meta[col]['type'] == "discrete":
-                log.info("Column '{}': {} different values"
-                         .format(col, self.df[col].nunique())
+                log.info(f"Column '{col}': "
+                         f"{self.df[col].nunique()} different values"
                          )
 
     def search_missing_values(self):
@@ -568,8 +557,9 @@ class Dataset():
         columns_with_missing = self.df.columns[self.df.isnull().any()].tolist()
         if columns_with_missing:
             for col in columns_with_missing:
-                self.column_meta[col]['missing'] = True
-            log.warning("Missing values found in columns: '{}'"
-                        .format(" ".join(columns_with_missing)))
+                self.column_meta[col]["missing"] = True
+            log.warning("Missing values found in columns: "
+                        f"{' '.join(columns_with_missing)}"
+                        )
         else:
             log.info("No missing values found")

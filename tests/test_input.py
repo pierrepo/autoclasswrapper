@@ -83,7 +83,7 @@ class TestDatasetClass(object):
         ds.read_datafile()
         ds.search_missing_values()
         assert ("WARNING  Missing values found in columns:"
-                " 'colI colJ'") in caplog.text
+                " colI colJ") in caplog.text
 
     def test_clean_column_names(self, caplog):
         name = os.path.join(here, dir_data, "sample-column-names.tsv")
