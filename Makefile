@@ -32,5 +32,5 @@ autoclass: init
 	rm -f autoclass-c-3-3-6.tar.gz
 
 
-doc:
+doc: doc/source
 	cd doc && pipenv run make html

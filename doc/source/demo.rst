@@ -1,7 +1,7 @@
 Demo
 ====
 
-You will find demo dataset and script in the `demo` directory of the project.
+You will find demo dataset and script in the ``demo`` directory of the project.
 
 To get the project, you can either clone it:
 
@@ -23,4 +23,3 @@ or download it:
    :maxdepth: 1
 
    ./notebooks/demo
-
