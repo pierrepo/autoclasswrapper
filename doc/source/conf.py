@@ -24,8 +24,8 @@ source_suffix = ['.rst', '.ipynb']
 master_doc = 'index'
 
 # General information about the project.
-project = u'autoclasswrapper'
-copyright = u'2018, Pierre Poulain'
+project = u'AutoClassWrapper'
+copyright = u'2019, Pierre Poulain'
 
 # The short X.Y.Z version.
 import autoclasswrapper
