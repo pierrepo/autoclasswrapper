@@ -18,7 +18,7 @@ def tmp_dir(tmpdir_factory):
 
 def test_raise_on_duplicates(caplog):
     with pytest.raises(wrapper.DuplicateColumnNameError,
-                       message="Expecting DuplicateColumnNameError"):
+                       match="Found duplicate column names"):
         wrapper.raise_on_duplicates(["A", "B", "B"])
 
 
@@ -40,7 +40,7 @@ class TestDatasetClass(object):
         ds = wrapper.Dataset("", "merged")
         ds.input_file = os.path.join(here, dir_data, "input-dup-col.tsv")
         with pytest.raises(wrapper.DuplicateColumnNameError,
-                           message="Expecting DuplicateColumnNameError"):
+                           match="Found duplicate column names"):
             ds.check_duplicate_col_names()
 
     def test_read_datafile(self, caplog):
