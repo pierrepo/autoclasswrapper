@@ -88,7 +88,7 @@ class Output():
                 try:
                     return f(self, *args, **kwargs)
                 except Exception as e:
-                    for line in str(e).split('\n'):
+                    for line in str(e).split("\n"):
                         log.error(line)
                     self.had_error = True
         try_function.__name__ = f.__name__
@@ -112,21 +112,21 @@ class Output():
         # - create empty dataframe to store class/cluster probability
         #   for all cases (i.e gene/protein)
         classes = set()
-        with open(case_name, 'r') as case_file:
+        with open(case_name, "r") as case_file:
             for line in case_file:
                 if not line:
                     continue
-                if line.startswith('#') or line.startswith('DATA'):
+                if line.startswith("#") or line.startswith("DATA"):
                     continue
                 items = line.split()
                 classes.add(int(items[1]))
                 self.case_number += 1
             self.class_number = len(classes)
-        log.info("Found {} cases classified in {} classes"
-                 .format(self.case_number, self.class_number))
+        log.info(f"Found {self.case_number} cases classified in "
+                 f"{self.class_number} classes")
         columns = ["main-class", "main-class-proba"]
         for i in range(self.class_number):
-            columns.append("class-{}-proba".format(i+1))
+            columns.append(f"class-{i+1}-proba")
         self.stats = pd.DataFrame(0.0,
                                   index=np.arange(1, self.case_number+1),
                                   columns=columns)
@@ -139,9 +139,8 @@ class Output():
                     continue
                 items = line.split()
                 assert len(items) >= 0, \
-                    ("Need case#, class and prob in {}:\n "
-                     "{}\n"
-                     .format(input_file, line.rstrip()))
+                    (f"Need case#, class and prob in {input_file}:\n "
+                     f"{line.rstrip()}\n")
                 case = int(items[0])
                 for idx in range(1, len(items), 2):
                     class_id = int(items[idx]) + 1
@@ -149,7 +148,7 @@ class Output():
                     if idx == 1:
                         self.stats.loc[case, "main-class"] = class_id
                         self.stats.loc[case, "main-class-proba"] = proba
-                    label = "class-{}-proba".format(class_id)
+                    label = f"class-{class_id}-proba"
                     self.stats.loc[case, label] = proba
         # cast class id to int
         self.stats["main-class"] = self.stats["main-class"].astype(int)
@@ -163,9 +162,8 @@ class Output():
         nrows, ncols = self.df.shape
         self.experiment_names = list(self.df.columns)
         assert len(self.stats.index) == nrows, \
-            ("Number of cases found in results ({}) "
-             "should match number of rows in input file ({})!"
-             .format(len(self.stats.index), input_name))
+            (f"Number of cases found in results ({len(self.stats.index)}) "
+             f"should match number of rows in input file ({input_name})!")
         self.stats.index = self.df.index
         self.df = pd.concat([self.df, self.stats], axis=1)
         # prepare data for export
@@ -200,8 +198,7 @@ class Output():
         # build gid
         df_tmp["idx"] = np.arange(1, df_tmp.shape[0]+1, dtype=int)
         df_tmp["gid"] = df_tmp.apply(
-            lambda x: "GENE{:04d}-CL{:03.0f}X".format(x["idx"],
-                                                      x["main-class"]),
+            lambda x: f"GENE{x['idx']:04d}-CL{x['main-class']:03.0f}X",
             axis=1)
         # sort by increasing class
         df_tmp.sort_values(by=["main-class", "main-class-proba"],
@@ -212,9 +209,10 @@ class Output():
             headers = ["GID", "UNIQID", "NAME", "GWEIGHT"]
             headers += self.experiment_names
             if with_proba:
-                headers += ["class-{}-proba"
-                            .format(i+1) for i in range(self.class_number)]
-            cdtfile.write("{}\n".format("\t".join(headers)))
+                headers += [f"class-{i+1}-proba"
+                            for i in range(self.class_number)]
+            content = "\t".join(headers)
+            cdtfile.write(f"{content}\n")
             # write 'EWEIGHT' line
             eweight = "EWEIGHT\t\t\t"+"\t1"*len(self.experiment_names)
             if with_proba:
@@ -224,8 +222,8 @@ class Output():
             col_names = ["gid", "name1", "name2", "gweight"]
             col_names += self.experiment_names
             if with_proba:
-                col_names += ["class-{}-proba"
-                              .format(i+1) for i in range(self.class_number)]
+                col_names += [f"class-{i+1}-proba"
+                              for i in range(self.class_number)]
             for class_idx in range(1, self.class_number+1):
                 cluster = df_tmp[df_tmp["main-class"] == class_idx]
                 cdtfile.write(cluster.to_csv(sep="\t",
@@ -235,8 +233,7 @@ class Output():
                                              na_rep=""))
                 # add spacer between clusters
                 for dummy in range(1, 6):
-                    cdtfile.write("GENE{:04d}-{:03.0f}S\n"
-                                  .format(dummy, class_idx))
+                    cdtfile.write(f"GENE{dummy:04d}-{class_idx:03.0f}S\n")
 
     @handle_error
     def write_class_stats(self):
@@ -272,7 +269,7 @@ class Output():
         log.info("Writing dendrogram")
         stat_name = self.root_out_name + "_stats.tsv"
         if not os.path.exists(stat_name):
-            log.error("Cannot find {}".format(stat_name))
+            log.error(f"Cannot find {stat_name}")
             return 0
         df = pd.read_csv(stat_name, sep="\t")
         # keep cluster labels and counts
@@ -302,7 +299,7 @@ class Output():
             leaf_font_size=12,
             leaf_rotation=90,
             above_threshold_color="grey",
-            labels=["{:.0f} [{:.0f}]".format(name, value)
+            labels=[f"{name:.0f} [{value:.0f}]"
                     for name, value in class_names_values.items()
                     ]
         )
