@@ -273,9 +273,10 @@ class Output():
             return 0
         df = pd.read_csv(stat_name, sep="\t")
         # keep cluster labels and counts
-        class_names_values = {val[0]:val[1]
+        class_names_values = {val[0]: val[1]
                               for val
-                              in df[df["stat"] == "count"][["class", df.columns[-1]]].values
+                              in df[df["stat"] == "count"][
+                                    ["class", df.columns[-1]]].values
                               }
         # prepare dataframe:
         # 1. isolate 'mean' values
@@ -284,7 +285,7 @@ class Output():
         df_clean = (df.query("stat == 'mean'")
                       .dropna()
                       .drop(labels=["stat", "class"], axis=1)
-        )
+                    )
         Z = hierarchy.linkage(df_clean, "ward")
         plt.rcParams["lines.linewidth"] = 2.5
         plt.rcParams["font.size"] = 16

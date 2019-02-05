@@ -32,7 +32,7 @@ def raise_on_duplicates(input_list):
         raise DuplicateColumnNameError(
             ("Found duplicate column names:\n"
              f"{col_names}\nPlease clean your header"
-            ))
+             ))
 
 
 class DuplicateColumnNameError(Exception):
@@ -197,7 +197,7 @@ class Input():
         tsv_name = self.root_name + ".tsv"
         log.info(f"Writing {db2_name} file")
         log.info("If any, missing values will be encoded"
-                f" as '{self.db2_missing_char}'")
+                 f" as '{self.db2_missing_char}'")
         self.full_dataset.df.to_csv(db2_name,
                                     header=False,
                                     sep=self.db2_separator_char,
@@ -507,7 +507,7 @@ class Dataset():
 
         Unauthorized characters are replaced by '_'
         """
-        #regex = re.compile('[^A-Za-z0-9 ._+-]+')
+        # regex = re.compile('[^A-Za-z0-9 ._+-]+')
         regex = re.compile('[^A-Za-z0-9._+-]+')
         log.debug("Checking column names")
         # check index column name first

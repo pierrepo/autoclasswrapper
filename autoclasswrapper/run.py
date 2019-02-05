@@ -8,7 +8,7 @@ import os
 import subprocess
 
 
-RUN_SCRIPT_CONTENT="""
+RUN_SCRIPT_CONTENT = """
 # the "y" parameter validates warning
 # in case of a reproducible run
 autoclass -search {0}.db2 {0}.hd2 {0}.model {0}.s-params <<EOF
@@ -18,9 +18,9 @@ autoclass -reports {0}.results-bin {0}.search {0}.r-params
 
 if [ $? -eq 0 ]
 then
-	touch autoclass_run_success
+    touch autoclass_run_success
 else
-	touch autoclass_run_failure
+    touch autoclass_run_failure
 fi
 """
 
