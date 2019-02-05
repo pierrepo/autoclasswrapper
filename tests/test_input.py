@@ -65,7 +65,7 @@ class TestDatasetClass(object):
         ds.read_datafile()
         assert "10 rows and 3 columns" in caplog.text
         with pytest.raises(wrapper.CastFloat64Error,
-                           message="Expecting CastFloat64Error exception"):
+                           match="could not convert string to float"):
             ds.check_data_type()
 
     def test_check_data_type_discrete_OK(self, caplog):
