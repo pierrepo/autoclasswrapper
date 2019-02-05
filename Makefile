@@ -16,6 +16,11 @@ test:
 test-coverage:
 	pipenv run py.test --cov-config .coveragerc --cov=autoclasswrapper --cov-report term-missing
 
+check-style:
+	pipenv run pycodestyle autoclasswrapper \
+	&& pipenv run pydocstyle autoclasswrapper \
+	&& pipenv run pylint autoclasswrapper
+
 compile:
 	#pipenv run python setup.py sdist
 	pipenv run python setup.py bdist_wheel
