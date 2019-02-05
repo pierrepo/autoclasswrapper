@@ -29,10 +29,9 @@ def raise_on_duplicates(input_list):
     """
     if len(input_list) != len(set(input_list)):
         col_names = " ".join(["'{}'".format(name) for name in input_list])
-        raise DuplicateColumnNameError(
-            ("Found duplicate column names:\n"
-             f"{col_names}\nPlease clean your header"
-             ))
+        raise DuplicateColumnNameError("Found duplicate column names:\n"
+                                       f"{col_names}\n"
+                                       "Please clean your header")
 
 
 class DuplicateColumnNameError(Exception):
@@ -46,10 +45,9 @@ class DuplicateColumnNameError(Exception):
 class CastFloat64Error(Exception):
     """Exception raised when data column cannot be casted to float64 type."""
 
-    def __init__(self, col, e):
+    def __init__(self, message):
         """Instantiate object."""
-        self.message = (f"Cannot cast column '{col}' to float\n"
-                        f"{str(e)}\nCheck your input file!")
+        self.message = message
 
 
 class Input():
@@ -545,7 +543,10 @@ class Dataset():
                                             .to_string())
                              )
                 except Exception as e:
-                    raise CastFloat64Error(col, e)
+                    raise CastFloat64Error(
+                        f"Cannot cast column '{col}' to float\n"
+                        f"{str(e)}\n"
+                        "Check your input file!")
             if self.column_meta[col]['type'] == "discrete":
                 log.info(f"Column '{col}': "
                          f"{self.df[col].nunique()} different values"
