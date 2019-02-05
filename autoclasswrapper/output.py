@@ -158,7 +158,7 @@ class Output():
         """Aggregate autoclass classes with input data."""
         log.info("Aggregating input data")
         input_name = self.root_in_name + ".tsv"
-        self.df = pd.read_table(input_name, sep="\t", header=0, index_col=0)
+        self.df = pd.read_csv(input_name, sep="\t", header=0, index_col=0)
         nrows, ncols = self.df.shape
         self.experiment_names = list(self.df.columns)
         assert len(self.stats.index) == nrows, \

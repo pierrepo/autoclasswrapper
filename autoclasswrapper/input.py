@@ -478,11 +478,11 @@ class Dataset():
         encoding = self.guess_encoding()
         log.info(f"Detected encoding: {encoding}")
         # load data
-        self.df = pd.read_table(self.input_file,
-                                sep=self.separator_char,
-                                header=0,
-                                index_col=0,
-                                encoding=encoding)
+        self.df = pd.read_csv(self.input_file,
+                              sep=self.separator_char,
+                              header=0,
+                              index_col=0,
+                              encoding=encoding)
         nrows, ncols = self.df.shape
         # save column meta data (data type, error, missing values)
         for col in self.df.columns:
