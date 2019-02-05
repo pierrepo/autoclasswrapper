@@ -76,7 +76,7 @@ class Run():
                 try:
                     return f(self, *args, **kwargs)
                 except Exception as e:
-                    for line in str(e).split('\n'):
+                    for line in str(e).split("\n"):
                         log.error(line)
                     self.had_error = True
         try_function.__name__ = f.__name__
@@ -111,12 +111,12 @@ class Run():
         log_name = self.root_name + ".log"
         rlog_name = self.root_name + ".rlog"
         with open(run_name, "w") as runfile:
-            runfile.write("for a in $(seq 1 {}) \n".format(time))
+            runfile.write(f"for a in $(seq 1 {time}) \n")
             runfile.write("do \n")
-            runfile.write("touch {} \n".format(log_name))
+            runfile.write(f"touch {log_name} \n")
             runfile.write("sleep 1 \n")
             runfile.write("done \n")
-            runfile.write("touch {} \n".format(rlog_name))
+            runfile.write(f"touch {rlog_name} \n")
 
     @handle_error
     def run(self, tag=""):
@@ -132,5 +132,5 @@ class Run():
         """
         log.info("Running clustering...")
         run_name = self.root_name + ".sh"
-        proc = subprocess.Popen(['nohup', 'bash', run_name, tag],
-                                env=os.environ)
+        proc = subprocess.Popen(["nohup", "bash", run_name, tag],
+		                        env=os.environ)
