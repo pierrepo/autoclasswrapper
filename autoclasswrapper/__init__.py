@@ -1,6 +1,6 @@
 """autoclasswrapper: Python wrapper for AutoClass clustering."""
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 __copyright__ = "Copyright 2018 Pierre Poulain"
 
 import logging

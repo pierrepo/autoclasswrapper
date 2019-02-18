@@ -1,7 +1,7 @@
 AutoClassWrapper documentation
 ==============================
 
-Version 1.2.0
+Version 1.3.0
 
 .. toctree::
    :maxdepth: 1

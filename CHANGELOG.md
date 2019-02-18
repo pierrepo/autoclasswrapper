@@ -1,4 +1,6 @@
 **Dev**
+
+**1.3.0**
 - Redirect run ouput to log files
 - Use f-strings
 
