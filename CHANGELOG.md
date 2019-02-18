@@ -1,4 +1,6 @@
 **Dev**
+- Redirect run ouput to log files
+- Use f-strings
 
 **1.2.0**
 - Handle error while checking for autoclass version
