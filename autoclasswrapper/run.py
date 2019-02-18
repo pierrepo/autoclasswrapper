@@ -11,10 +11,10 @@ import subprocess
 RUN_SCRIPT_CONTENT = """
 # the "y" parameter validates warning
 # in case of a reproducible run
-autoclass -search {0}.db2 {0}.hd2 {0}.model {0}.s-params <<EOF
+autoclass -search {0}.db2 {0}.hd2 {0}.model {0}.s-params >autoclass-search.log 2>&1 <<EOF
 y
 EOF
-autoclass -reports {0}.results-bin {0}.search {0}.r-params
+autoclass -reports {0}.results-bin {0}.search {0}.r-params >autoclass-report.log 2>&1
 
 if [ $? -eq 0 ]
 then
