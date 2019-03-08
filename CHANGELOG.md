@@ -1,4 +1,5 @@
 **Dev**
+- Rename marker files to autoclass-run-success and autoclass-run-failure
 
 **1.4.0**
 - Print columns with missing values one column per line
