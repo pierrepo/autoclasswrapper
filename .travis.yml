@@ -20,7 +20,7 @@ before_install:
 
 install:
     - make install
-    - make autoclass
+    - make install-autoclass
 
 
 before_script:
