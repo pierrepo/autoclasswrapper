@@ -394,7 +394,7 @@ class Dataset():
     data_type : string (dafault: "")
         Type of data contained in input file.
         Either "real scalar", "real location", "discrete" or "merged"
-        "merged" is special case corresponding to merged datasets.
+        "merged" is a special case corresponding to merged datasets.
     error : int (default: None)
         Value of error on data.
     separator_char : string (defaut: "\t")
@@ -435,7 +435,7 @@ class Dataset():
         self.column_meta = {}
         # verify data type
         assert self.data_type in \
-            ['real scalar', 'real location', 'discrete', 'merged'], \
+            ["real scalar", "real location", "discrete", "merged"], \
             ("data type in {} should be: "
              "'real scalar', 'real location' or 'discrete'"
              .format(self.input_file))
@@ -467,7 +467,7 @@ class Dataset():
         """
         msg = (f"Reading data file '{self.input_file}' "
                f"as '{self.data_type}'")
-        if self.data_type in ['real scalar', 'real location']:
+        if self.data_type in ["real scalar", "real location"]:
             msg += f" with error {self.error}"
         log.info(msg)
         # check for duplicate column names
@@ -506,7 +506,7 @@ class Dataset():
         Unauthorized characters are replaced by '_'
         """
         # regex = re.compile('[^A-Za-z0-9 ._+-]+')
-        regex = re.compile('[^A-Za-z0-9._+-]+')
+        regex = re.compile("[^A-Za-z0-9._+-]+")
         log.debug("Checking column names")
         # check index column name first
         col_name = self.df.index.name
@@ -534,14 +534,18 @@ class Dataset():
         """
         log.info("Checking data format")
         for col in self.df.columns:
-            if self.column_meta[col]['type'] in ['real scalar',
-                                                 'real location']:
+            if self.column_meta[col]["type"] in ["real scalar",
+                                                 "real location"]:
                 try:
-                    self.df[col].astype('float64')
-                    log.info(f"Column '{col}'\n"
-                             + (self.df[col].describe(percentiles=[])
-                                            .to_string())
+                    self.df[col].astype("float64")
+                    stats = (f"Column '{col}'\n"
+                             + self.df[col]
+                                   .describe(percentiles=[])
+                                   .to_string()
                              )
+                    for line in stats.split("\n"):
+                        log.info(line)
+                    log.info("---")
                 except Exception as e:
                     raise CastFloat64Error(
                         f"Cannot cast column '{col}' to float\n"

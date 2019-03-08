@@ -1,4 +1,6 @@
 **Dev**
+- Print columuns with missing values one column per line
+- Embed column stats in logging output
 
 **1.3.0**
 - Redirect run ouput to log files
