@@ -1,4 +1,6 @@
 **Dev**
+
+**1.4.1**
 - Rename marker files to autoclass-run-success and autoclass-run-failure
 
 **1.4.0**
