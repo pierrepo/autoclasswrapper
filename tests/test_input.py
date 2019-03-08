@@ -11,8 +11,7 @@ dir_data = "test_data"
 
 @pytest.fixture(scope='session')
 def tmp_dir(tmpdir_factory):
-    """Create temp dir and cd in it
-    """
+    """Create temp dir and cd in it."""
     tmpd = tmpdir_factory.mktemp("input")
     os.chdir(str(tmpd))
 
@@ -23,8 +22,7 @@ def test_raise_on_duplicates(caplog):
 
 
 class TestDatasetClass(object):
-    """Tests for the Dataset class
-    """
+    """Tests for the Dataset class."""
 
     def test_init(self):
         ds = wrapper.Dataset("", "merged")
@@ -82,8 +80,8 @@ class TestDatasetClass(object):
         ds = wrapper.Dataset(name, "real location", error=0.01)
         ds.read_datafile()
         ds.search_missing_values()
-        assert ("WARNING  Missing values found in columns:"
-                " colI colJ") in caplog.text
+        assert "WARNING  Missing values found in column: colI" in caplog.text
+        assert "WARNING  Missing values found in column: colJ" in caplog.text
 
     def test_clean_column_names(self, caplog):
         name = os.path.join(here, dir_data, "sample-column-names.tsv")
@@ -95,10 +93,8 @@ class TestDatasetClass(object):
         assert "Column 'col[]()/' renamed to 'col_'" in caplog.text
 
 
-
 class TestInputClass(object):
-    """Test for the Input class
-    """
+    """Test for the Input class."""
 
     def test_init(self, tmp_dir):
         clust = wrapper.Input()

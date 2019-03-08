@@ -559,8 +559,6 @@ class Dataset():
         if columns_with_missing:
             for col in columns_with_missing:
                 self.column_meta[col]["missing"] = True
-            log.warning("Missing values found in columns: "
-                        f"{' '.join(columns_with_missing)}"
-                        )
+                log.warning(f"Missing values found in column: {col}")
         else:
             log.info("No missing values found")
