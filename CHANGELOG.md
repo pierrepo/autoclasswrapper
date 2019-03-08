@@ -1,7 +1,7 @@
 **Dev**
 
 **1.4.0**
-- Print columuns with missing values one column per line
+- Print columns with missing values one column per line
 - Embed column stats in logging output
 
 **1.3.0**
