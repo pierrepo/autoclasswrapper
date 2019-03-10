@@ -14,7 +14,7 @@ authors:
   orcid: 0000-0003-4177-3619
   affiliation: 1
 affiliations:
-- name: "Mitochondria, Metals and Oxidative Stress" group, Institut Jacques Monod, UMR 7592, Univ. Paris Diderot, CNRS, Sorbonne Paris Cité, France.
+- name: Mitochondria, Metals and Oxidative Stress group, Institut Jacques Monod, UMR 7592, Univ. Paris Diderot, CNRS, Sorbonne Paris Cité, France.
   index: 1
 date: 8 March 2019
 bibliography: paper.bib
