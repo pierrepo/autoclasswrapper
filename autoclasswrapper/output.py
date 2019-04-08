@@ -247,7 +247,7 @@ class Output():
         # Select experiment columns with numerical values only.
         target_columns = []
         for column_name in self.experiment_names:
-            if df[column_name].dtype != object:
+            if self.df[column_name].dtype != object:
                 target_columns.append(column_name)
         if len(target_columns) == 0:
             log.warning("No numerical column available for statistics")
