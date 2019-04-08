@@ -244,7 +244,15 @@ class Output():
         """
         log.info("Writing class statistics")
         stat_name = self.root_out_name + "_stats.tsv"
-        df_tmp = self.df[["main-class"] + self.experiment_names]
+        # Select experiment columns with numerical values only.
+        target_columns = []
+        for column_name in self.experiment_names:
+            if df[column_name].dtype != object:
+                target_columns.append(column_name)
+        if len(target_columns) == 0:
+            log.warning("No numerical column available for statistics")
+            return 0
+        df_tmp = self.df[["main-class"] + target_columns]
         # compute metrics
         df_count = df_tmp.groupby("main-class").count()
         df_count["stat"] = "count"
