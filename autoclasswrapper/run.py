@@ -3,6 +3,8 @@
 Create run script and run classification
 """
 
+from .tools import get_autoclass_version
+
 import logging
 import os
 import subprocess
@@ -130,7 +132,8 @@ class Run():
             Tag to identify the autoclass run among other processes
 
         """
-        log.info("Running clustering...")
-        run_name = self.root_name + ".sh"
-        proc = subprocess.Popen(["nohup", "bash", run_name, tag],
-                                env=os.environ)
+        if get_autoclass_version():
+            log.info("Running clustering...")
+            run_name = self.root_name + ".sh"
+            proc = subprocess.Popen(["nohup", "bash", run_name, tag],
+                                    env=os.environ)
