@@ -12,10 +12,10 @@ __pycache__/
 # lab / dev tests
 lab/
 
-# demo
-demo/autoclass*
-demo/nohup.out
-demo/*.tsv
+# notebooks
+notebooks/autoclass*
+notebooks/nohup.out
+notebooks/*.tsv
 
 # Python package builds
 autoclasswrapper.egg-info/
