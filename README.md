@@ -15,6 +15,25 @@ AutoClassWrapper is a Python wrapper to ease the use of Autoclass C.
 
 ## Installation and dependencies
 
+
+### AutoClass C installation 
+
+AutoClass C can be found [here](https://ti.arc.nasa.gov/tech/rse/synthesis-projects-applications/autoclass/autoclass-c/). The installation process can be achieved with the following commands:
+```
+$ wget https://ti.arc.nasa.gov/m/project/autoclass/autoclass-c-3-3-6.tar.gz
+$ tar zxvf autoclass-c-3-3-6.tar.gz
+$ rm -f autoclass-c-3-3-6.tar.gz
+$ export PATH=$PATH:$(pwd)/autoclass-c
+```
+
+Please note that is you are running a 64-bit operating system, you will also need to install the standard 32-bit libraries. For instance, on a Debian/Ubuntu-like system:
+```
+$ sudo apt-get install -y libc6-i386
+```
+
+
+### AutoClassWrapper installation 
+
 Dependencies:
 
 - **Python 3.6** or above
