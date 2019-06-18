@@ -16,7 +16,7 @@ python:
 
 before_install:
     # instal lib32 for autoclass
-    - sudo apt-get install -y lib32z1
+    - sudo apt-get install -y libc6-i386
 
 install:
     - make install
