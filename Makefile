@@ -16,11 +16,11 @@ install-dev: init ## Install dependencies for development
 .PHONY: install-dev
 
 test: ## Run tests
-	pipenv run py.test tests
+	pipenv run pytest tests
 .PHONY: test
 
 test-coverage: ## Run tests with coverage
-	pipenv run py.test --cov-config .coveragerc --cov=autoclasswrapper --cov-report term-missing
+	pipenv run pytest --cov-config .coveragerc --cov=autoclasswrapper --cov-report term-missing
 .PHONY: test-coverage
 
 lint: ## Lint code
