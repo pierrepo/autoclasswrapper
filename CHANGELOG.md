@@ -1,4 +1,6 @@
 **Dev**
+- Print AutoClass C Version on run
+- Update jinja and urllib3 for security issues
 
 **1.4.1**
 - Rename marker files to autoclass-run-success and autoclass-run-failure
