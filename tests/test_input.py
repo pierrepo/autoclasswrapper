@@ -80,8 +80,8 @@ class TestDatasetClass(object):
         ds = wrapper.Dataset(name, "real location", error=0.01)
         ds.read_datafile()
         ds.search_missing_values()
-        assert "WARNING  Missing values found in column: colI" in caplog.text
-        assert "WARNING  Missing values found in column: colJ" in caplog.text
+        assert "Missing values found in column: colI" in caplog.text
+        assert "Missing values found in column: colJ" in caplog.text
 
     def test_clean_column_names(self, caplog):
         name = os.path.join(here, dir_data, "sample-column-names.tsv")
