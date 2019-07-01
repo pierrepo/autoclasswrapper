@@ -51,10 +51,10 @@ doc: doc/source ## Build documentation
 	cd doc && pipenv run make html
 .PHONY: doc
 
-clean-demo: ## Clean demo files
-	rm -f demo/autoclass*
-	rm -f demo/nohup.out
-	rm -f demo/*.tsv
+clean-notebooks: ## Clean demo files
+	rm -f notebooks/autoclass*
+	rm -f notebooks/nohup.out
+	rm -f notebooks/*.tsv
 .PHONY: clean-demo
 
 help:
