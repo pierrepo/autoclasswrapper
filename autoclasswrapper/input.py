@@ -55,15 +55,15 @@ class Input():
 
     Parameters
     ----------
-    root_name : string (default "autoclass")
+    root_name : string, optional (default "autoclass")
         Root name to generate input files for AutoClass C.
         Example: "autoclass" will lead to "autoclass.db2",
         "autoclass.model", "autoclass.s-params"...
-    db2_separator_char : string (default: "\t")
+    db2_separator_char : string, optional (default: "\t")
         Character used to separate columns of data in AutoClass C db2 file.
-    db2_missing_char : string (default: "?")
+    db2_missing_char : string, optional (default: "?")
         Character used to encode missing data in AutoClass C db2 file.
-    tolerate_error : bool (default: False)
+    tolerate_error : bool, optional (default: False)
         If True, countinue generation of AutoClass C input files even if an
         error is encounter.
         If False, stop at first error.
@@ -124,7 +124,7 @@ class Input():
     def add_input_data(self,
                        input_file,
                        input_type,
-                       input_error=None,
+                       input_error=0.01,
                        input_separator_char="\t",
                        input_missing_char=""):
         r"""Read input data file and append to list of datasets.
@@ -136,11 +136,11 @@ class Input():
         input_type : string
             Type of data contained in input file.
             Either "real scalar", "real location" or "discrete"
-        input_error : float (default: None)
+        input_error : float, optional (default: 0.01)
             Input error value.
-        input_separator_char : string (default: "\t")
+        input_separator_char : string, optional (default: "\t")
             Character used to separate columns of data in input file.
-        input_missing_char : string (default: "")
+        input_missing_char : string, optional (default: "")
             Character used to encode missing data in input file.
 
         """
@@ -298,27 +298,27 @@ class Input():
 
         Parameters
         ----------
-        max_duration : int (default: 3600)
+        max_duration : int, optional (default: 3600)
             Maximum time (in seconds) for the AutoClass C simulation.
             If set max_duration = 0, simulation will run with NO time limit
             For more details, see AutoClass C documentation:
             file search-c.text, lines 493-495
-        max_n_tries : int (default: 200)
+        max_n_tries : int, optional (default: 200)
             Number of trials to run.
             For more details, see AutoClass C documentation:
             file search-c.text, lines 403-404
-        max_cycles : int (default: 1000)
+        max_cycles : int, optional (default: 1000)
             Max number of cycles per trial.
             This is maximum that may not be reached.
             For more details, see AutoClass C documentation:
             file search-c.text, lines 316-317
-        start_j_list : list of int (default: [2, 3, 5, 7, 10, 15, 25, 35,
-                                             45, 55, 65, 75, 85, 95, 105])
+        start_j_list : list of int, optional (default: [2, 3, 5, 7, 10, 15, 25, 35,
+                                                        45, 55, 65, 75, 85, 95, 105])
             Initial guesses of the number of clusters
             Autoclass default: 2, 3, 5, 7, 10, 15, 25
             For more details, see AutoClass C documentation:
             file search-c.text, line 332
-        reproducible_run : boolean (default: False)
+        reproducible_run : boolean, optional (default: False)
             If set to True, define parameters to obtain reproducible run.
             This parameters are considered "for testing *only*" by autoclass-c
             and should NOT be used for production run.
@@ -398,11 +398,11 @@ class Dataset():
         Type of data contained in input file.
         Either "real scalar", "real location", "discrete" or "merged"
         "merged" is a special case corresponding to merged datasets.
-    error : int (default: None)
+    error : float, optional (default: 0.01)
         Value of error on data.
-    separator_char : string (defaut: "\t")
+    separator_char : string, optional (defaut: "\t")
         Character used to separate columns of data in input file.
-    missing_char : string (default: "")
+    missing_char : string, optional (default: "")
         Character used to encode missing data in input file.
 
 

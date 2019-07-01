@@ -11,7 +11,7 @@ AutoClass C is an implementation of the AutoClass algorithm developed by the NAS
 AutoClassWrapper is a Python wrapper to ease the use of Autoclass C.
 
 
-If you want to install AutoClassWrapper, use:
+To install AutoClassWrapper, use:
 
 .. code-block:: bash
 

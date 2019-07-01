@@ -2,7 +2,9 @@
 - Print AutoClass C Version on run
 - Update jinja and urllib3 for security issues
 - Rename input.merge_dataframes() to input.prepare_input_data()
-- 
+- Increase documentation 
+
+
 **1.4.1**
 - Rename marker files to autoclass-run-success and autoclass-run-failure
 

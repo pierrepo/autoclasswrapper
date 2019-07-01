@@ -34,11 +34,11 @@ class Run():
 
     Parameters
     ----------
-    root_name : string (default "autoclass")
+    root_name : string, optional (default: "autoclass")
         Root name for input files and running script.
         Example: "autoclass" will lead to "autoclass.db2",
         "autoclass.model", "autoclass.sh"...
-    tolerate_error : bool (default: False)
+    tolerate_error : bool, optional (default: False)
         If True, countinue generation of autoclass input files even if an
         error is encounter.
         If False, stop at first error.
@@ -104,7 +104,7 @@ class Run():
 
         Parameters
         ----------
-        time : int (default: 60)
+        time : int (default: 60), optional
             Time in seconds to wait.
 
         """
@@ -128,7 +128,7 @@ class Run():
 
         Parameters
         ----------
-        tag : string (default: "")
+        tag : string (default: ""), optional
             Tag to identify the autoclass run among other processes
 
         """
