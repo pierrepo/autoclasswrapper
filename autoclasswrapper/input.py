@@ -155,8 +155,11 @@ class Input():
         self.input_datasets.append(dataset)
 
     @handle_error
-    def merge_dataframes(self):
-        """Merge input dataframes from datasets.
+    def prepare_input_data(self):
+        """Prepare input data.
+
+        - Create a final dataframe.
+        - Merge datasets if multiple inputs.
 
         Notes
         -----
@@ -169,7 +172,7 @@ class Input():
         if len(self.input_datasets) == 1:
             self.full_dataset = self.input_datasets[0]
         else:
-            log.info("Merging input data")
+            log.info("Preparing input data")
             df_lst = []
             for dataset in self.input_datasets:
                 df_lst.append(dataset.df)
