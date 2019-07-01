@@ -114,7 +114,7 @@ class TestInputClass(object):
         clust.add_input_data(name, "real location")
         assert "Found duplicate column names" in caplog.text
 
-    def test_merge_data(self, caplog):
+    def test_prepare_input_data(self, caplog):
         clust = wrapper.Input()
         name1 = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name1, "real location")
@@ -122,7 +122,7 @@ class TestInputClass(object):
         clust.add_input_data(name2, "discrete")
         name3 = os.path.join(here, dir_data, "sample-real-scalar.tsv")
         clust.add_input_data(name3, "real scalar")
-        clust.merge_dataframes()
+        clust.prepare_input_data()
         print(caplog.text)
         assert "Final dataframe has 10 lines and 8 columns" in caplog.text
 
@@ -134,7 +134,7 @@ class TestInputClass(object):
         clust.add_input_data(name2, "discrete")
         name3 = os.path.join(here, dir_data, "sample-real-scalar.tsv")
         clust.add_input_data(name3, "real scalar")
-        clust.merge_dataframes()
+        clust.prepare_input_data()
         clust.create_db2_file()
         assert os.path.isfile("autoclass.db2")
         assert os.path.isfile("autoclass.tsv")
@@ -147,7 +147,7 @@ class TestInputClass(object):
         clust.add_input_data(name2, "discrete")
         name3 = os.path.join(here, dir_data, "sample-real-scalar.tsv")
         clust.add_input_data(name3, "real scalar")
-        clust.merge_dataframes()
+        clust.prepare_input_data()
         clust.create_hd2_file()
         assert os.path.isfile("autoclass.hd2")
 
@@ -161,7 +161,7 @@ class TestInputClass(object):
         clust.add_input_data(name3, "real scalar")
         name4 = os.path.join(here, dir_data, "sample-missing-values.tsv")
         clust.add_input_data(name4, "real location")
-        clust.merge_dataframes()
+        clust.prepare_input_data()
         clust.create_model_file()
         assert os.path.isfile("autoclass.model")
 
@@ -169,7 +169,7 @@ class TestInputClass(object):
         clust = wrapper.Input()
         name = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name, "real location")
-        clust.merge_dataframes()
+        clust.prepare_input_data()
         clust.create_sparams_file()
         assert os.path.isfile("autoclass.s-params")
 
@@ -177,7 +177,7 @@ class TestInputClass(object):
         clust = wrapper.Input()
         name = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name, "real location")
-        clust.merge_dataframes()
+        clust.prepare_input_data()
         clust.create_sparams_file(reproducible_run=True)
         assert os.path.isfile("autoclass.s-params")
         f_content = open("autoclass.s-params", "r").read()
@@ -202,7 +202,7 @@ class TestInputClass(object):
         clust = wrapper.Input()
         name = os.path.join(here, dir_data, "sample-real-location.tsv")
         clust.add_input_data(name, "real location")
-        clust.merge_dataframes()
+        clust.prepare_input_data()
         clust.create_hd2_file()
         clust.create_model_file()
         clust.create_sparams_file()
