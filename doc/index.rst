@@ -4,9 +4,8 @@ Welcome to AutoClassWrapper's documentation!
 **Version** |release|
 
 
-AutoClass is an unsupervised Bayesian classification system.
-
-AutoClass C is an implementation of the AutoClass algorithm developed by the NASA in 1995.
+    AutoClass is an unsupervised Bayesian classification system.
+    AutoClass C is an implementation of the AutoClass algorithm developed by the NASA in 1995.
 
 AutoClassWrapper is a Python wrapper to ease the use of Autoclass C.
 
@@ -15,7 +14,7 @@ To install AutoClassWrapper, use:
 
 .. code-block:: bash
 
-    $ pip install seq-to-first-iso 
+    $ pip install autoclasswrapper 
 
 you will also need AutoClass C:
 
@@ -42,9 +41,10 @@ User manual
 Tutorial
 ========
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
-    notebooks/demo
+    notebooks/demo_toy
+    notebooks/demo_iris
 
 
 Reference manual
