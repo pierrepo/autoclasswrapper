@@ -320,16 +320,16 @@ class Input():
             file search-c.text, line 332
         reproducible_run : boolean, optional (default: False)
             If set to True, define parameters to obtain reproducible run.
-            This parameters are considered "for testing *only*" by autoclass-c
-            and should NOT be used for production run.
-            The following AutoClass C parameters are set:
+            According to AutoClass C developers: "These parameter settings are 
+            for testing *only* -- they should not be utilized for normal AutoClass runs."
 
             - randomize_random_p = false
                 Random seed is set to 1 (instead of the usual current time)
             - start_fn_type = "block"
                 Instead of "random"
+            - min_report_period = value greater than duration of run
 
-            For more details, see autoclass documentation:
+            For more details, see AutoClass C documentation:
 
             - file search-c.text, line 678
             - file search-c.text, line 565
@@ -350,6 +350,7 @@ class Input():
             if reproducible_run is True:
                 sparams.write("randomize_random_p = false\n")
                 sparams.write('start_fn_type = "block"\n')
+                sparams.write(f"min_report_period = {max_duration*2}\n")
 
     @handle_error
     def create_rparams_file(self):
