@@ -91,8 +91,8 @@ class Run():
         log.info("Writing run file")
         run_name = self.root_name + ".sh"
         with open(run_name, "w") as runfile:
-            # the "y" paramter is to validate warning
-            # is case of for reproducible run
+            # the "y" parameter is to validate warning
+            # in case of a reproducible run
             runfile.write(RUN_SCRIPT_CONTENT.format(self.root_name))
 
     @handle_error
