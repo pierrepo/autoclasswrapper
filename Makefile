@@ -45,7 +45,7 @@ upload-to-pypi: ## Upload to PyPI
 
 install-autoclass: ## Install AutoClass C
 	# https://ti.arc.nasa.gov/tech/rse/synthesis-projects-applications/autoclass/autoclass-c/
-	wget https://ti.arc.nasa.gov/m/project/autoclass/autoclass-c-3-3-6.tar.gz
+	wget -q https://ti.arc.nasa.gov/m/project/autoclass/autoclass-c-3-3-6.tar.gz
 	tar zxvf autoclass-c-3-3-6.tar.gz
 	rm -f autoclass-c-3-3-6.tar.gz
 .PHONY: install-autoclass
