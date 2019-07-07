@@ -25,8 +25,8 @@ install:
     - conda update -q conda
     - conda info -a
     - conda create -n autoclasswrapper-dev python=${PYVER}
-    - travis_wait conda env update -f environment-dev.yml -n autoclasswrapper-dev
-    - travis_wait make install-autoclass
+    - conda env update -f environment-dev.yml -n autoclasswrapper-dev
+    - make install-autoclass
     - conda activate autoclasswrapper-dev
 
 
