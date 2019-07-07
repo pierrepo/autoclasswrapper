@@ -12,3 +12,5 @@ rm -f autoclass-c-3-3-6.tar.gz
 mkdir -p $HOME/.local/bin
 cp autoclass-c/autoclass $HOME/.local/bin/
 
+# install local package
+pip install -e .
