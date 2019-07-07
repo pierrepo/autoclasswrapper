@@ -19,8 +19,9 @@ before_install:
     - sudo apt-get install -y libc6-i386
 
 install:
-    - make install
-    - make install-autoclass
+    - travis_wait make install-dev
+    - travis_wait make install-autoclass
+    - conda activate autoclasswrapper-dev
 
 
 before_script:

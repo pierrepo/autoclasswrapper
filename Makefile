@@ -3,7 +3,7 @@ default: help
 init: ## Install miniconda
 	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 	bash miniconda.sh -b -p $HOME/miniconda
-	source $HOME/miniconda/etc/profile.d/conda.sh
+	. $HOME/miniconda/etc/profile.d/conda.sh
 	hash -r
 	conda config --set always_yes yes --set changeps1 no
 	conda update -q conda
@@ -11,11 +11,11 @@ init: ## Install miniconda
 .PHONY: init
 
 install: init ## Install dependencies
-	conda create env -f environment.yml
+	conda env create -f environment.yml
 .PHONY: install
 
 install-dev: init ## Install dependencies for development
-	conda create env -f environment-dev.yml
+	conda env create -f environment-dev.yml
 .PHONY: install-dev
 
 test: ## Run tests
