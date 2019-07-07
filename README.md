@@ -2,6 +2,7 @@
 
 [![License: BSD](https://img.shields.io/badge/License-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)   [![autoclasswrapper version on PyPI](https://badge.fury.io/py/autoclasswrapper.svg)](https://pypi.python.org/pypi/autoclasswrapper)   [![Build Status](https://travis-ci.org/pierrepo/autoclasswrapper.svg?branch=master)](https://travis-ci.org/pierrepo/autoclasswrapper)
 [![Documentation Status](https://readthedocs.org/projects/autoclasswrapper/badge/?version=latest)](https://autoclasswrapper.readthedocs.io/en/latest/?badge=latest)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pierrepo/autoclasswrapper/master?filepath=notebooks)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2527059.svg)](https://doi.org/10.5281/zenodo.2527059)
 
 
@@ -10,8 +11,6 @@ AutoClass is an unsupervised Bayesian classification system.
 [AutoClass C](https://ti.arc.nasa.gov/tech/rse/synthesis-projects-applications/autoclass/autoclass-c/) is an implementation of the AutoClass algorithm made by the NASA.
 
 AutoClassWrapper is a Python wrapper to ease the use of Autoclass C.
-
-Try it with Binder: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pierrepo/autoclasswrapper/master?filepath=notebooks)
 
 
 ## Installation and dependencies
