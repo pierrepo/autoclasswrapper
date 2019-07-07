@@ -14,7 +14,7 @@ Install AutoClassWrapper with `pip`:
 
 .. code-block:: bash
 
-    $ pip install autoclasswrapper 
+    $ python3 -m pip install autoclasswrapper
 
 you will also need AutoClass C:
 

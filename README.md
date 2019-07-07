@@ -43,12 +43,7 @@ Dependencies:
 AutoClassWrapper is available through the Python Package Index ([PyPI](https://pypi.org/)):
 
 ```
-$ python3 -m pip install --user autoclasswrapper
-```
-or
-```
-$ pipenv --three
-$ pipenv install autoclasswrapper
+$ python3 -m pip install autoclasswrapper
 ```
 
 

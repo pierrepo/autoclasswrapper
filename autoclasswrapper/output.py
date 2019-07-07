@@ -241,6 +241,7 @@ class Output():
 
         Number of elements per class.
         Mean and standard deviation values per experiment.
+        Missing values are skipped.
         """
         log.info("Writing class statistics")
         stat_name = self.root_out_name + "_stats.tsv"

@@ -17,7 +17,7 @@ However, AutoClass C user interface isn't very friendly and requires that data a
 To install AutoClassWrapper, use `pip`:
 
 ```bash
-$ pip install seq-to-first-iso 
+$ python3 -m pip install autoclasswrapper
 ```
 
 you will also need AutoClass C:
@@ -33,14 +33,12 @@ $ export PATH=$PATH:$(pwd)/autoclass-c
 $ sudo apt-get install -y libc6-i386
 ```
 
-# Quickstart
+# Data preparation 
 
-## Data preparation 
-
-AutoClass C can handle different types of data:
+AutoClass C can handle 3 different types of data:
 
 - *real scalar*: numerical values bounded by 0. Examples: length, weight, age...
-- *real location*: numerical values, positive et negative. Examples: position, microarray log ratio, elevation...
+- *real location*: numerical values, positive and negative. Examples: position, microarray log ratio, elevation...
 - *discrete*: qualitative data. Examples: color, phenotype, name...
 
 Each data type must be entered in **separate input file** (one for each type).
@@ -60,11 +58,11 @@ clust.add_input_data("example1.tsv", "real scalar")
 clust.add_input_data("example2.tsv", "real location")
 ```
 
-Input data format is [tab-separated](https://en.wikipedia.org/wiki/Tab-separated_values) values. User must provide the type of data (either `real scalar`, `real location` or `discrete`). 
+Input data format is [tab-separated](https://en.wikipedia.org/wiki/Tab-separated_values) values. Together with the name of the input file, user must provide the type of data (either `real scalar`, `real location` or `discrete`). 
 
 The default error on real values is 0.01. Error is relative for *real scalar* values (0.01 means 1%) but absolute for *real location* values. There is no error for *discrete* values. For *real scalar* and *real location* values, custom error can be defined with the `input_error` parameter of the `.add_input_data()` method.
 
-The next step is then to prepare input data and generate input files required by AutoClass C:
+The next step is to prepare input data and generate input files required by AutoClass C:
 
 ```python
 clust.prepare_input_data()
@@ -75,9 +73,12 @@ clust.create_sparams_file()
 clust.create_rparams_file()
 ```
 
+All this commands are compulsory and will create several parameter files in the current directory.
+
+
 ## Classification / clustering 
 
-Once input files are created, one can build helper run script and actually run AutoClass C:
+Once input files are created, one can build Bash run script and actually run AutoClass C:
 
 ```python
 import autoclasswrapper as wrapper
@@ -86,7 +87,11 @@ run.create_run_file()
 run.run()
 ```
 
-Note that, at this stage, AutoClass C must be installed and available in PATH (see installation section).
+At this stage, AutoClass C must be installed and available in PATH (see installation section).
+
+The Bash script that run AutoClass C runs it actually twice. The first time to perform the classification (clustering). The second  time to build a report from the raw results.
+
+The Bash script that run AutoClass C is loaded itself with the `nohup` command. This means that the only way to stop this script is by killing it!
 
 Depending on the size of the datasets (number of lines and columns), the classification might take some time to run (from few seconds to several hours). By default, the maximum running time is 3600 seconds (1 hour). This setting can be modified with the `max_duration` parameter of the `.create_sparams_file()` method.
 
