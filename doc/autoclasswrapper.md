@@ -76,7 +76,7 @@ clust.create_rparams_file()
 All this commands are compulsory and will create several parameter files in the current directory.
 
 
-## Classification / clustering 
+# Classification / clustering 
 
 Once input files are created, one can build Bash run script and actually run AutoClass C:
 
@@ -96,7 +96,7 @@ The Bash script that run AutoClass C is loaded itself with the `nohup` command. 
 Depending on the size of the datasets (number of lines and columns), the classification might take some time to run (from few seconds to several hours). By default, the maximum running time is 3600 seconds (1 hour). This setting can be modified with the `max_duration` parameter of the `.create_sparams_file()` method.
 
 
-## Results analysis
+# Results analysis
 
 Upon classification, results are ouput in different formats:
 
