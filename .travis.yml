@@ -17,7 +17,13 @@ before_install:
     - sudo apt-get install -y libc6-i386
 
 install:
-    - travis_wait make init
+    - wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+    - bash miniconda.sh -b -p ${HOME}/miniconda
+    - . ${HOME}/miniconda/etc/profile.d/conda.sh
+    - hash -r
+    - conda config --set always_yes yes --set changeps1 no
+    - conda update -q conda
+    - conda info -a
     - conda create -n autoclasswrapper-dev python=${PYVER}
     - travis_wait conda env update -f environment-dev.yml -n autoclasswrapper-dev
     - travis_wait make install-autoclass
