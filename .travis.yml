@@ -1,25 +1,24 @@
-language: python
-dist: "xenial"
+language: generic
 sudo: true
+
+env:
+    matrix:
+        - PYVER="3.6"
+        - PYVER="3.7"
 
 services:
     # Tricks to avoid matplotlib error about X11:
     # 'no display name and no $DISPLAY environment variable'
     # https://docs.travis-ci.com/user/gui-and-headless-browsers/#using-services-xvfb
     - xvfb
- 
-# available Python versions:
-# https://docs.travis-ci.com/user/languages/python/#Development-releases-support
-python:
-    - "3.6"
-    - "3.7"
 
 before_install:
     # instal lib32 for autoclass
     - sudo apt-get install -y libc6-i386
 
 install:
-    - travis_wait make install-dev
+    - conda create -n autoclasswrapper-dev python=${PYVER}
+    - travis_wait conda env update -f environment-dev.yml -n autoclasswrapper-dev
     - travis_wait make install-autoclass
     - conda activate autoclasswrapper-dev
 
