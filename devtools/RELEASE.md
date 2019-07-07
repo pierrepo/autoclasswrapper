@@ -5,7 +5,7 @@
 
 Install required packages:
 ```
-$ pipenv install --dev twine bumpversion
+$ conda create env -f environment-dev.yml
 ```
 
 For Zenodo integration, see [Making Your Code Citable](https://guides.github.com/activities/citable-code/).
@@ -24,7 +24,7 @@ $ make test-coverage
 We use the tool [bumpversion](https://github.com/peritus/bumpversion) to update and synchronize the version number
 across different files:
 ```
-$ pipenv run bumpversion --verbose --config-file devtools/bumpversion.cfg patch
+$ bumpversion --verbose --config-file devtools/bumpversion.cfg patch
 $ git push origin
 $ git push origin --tags
 ```
@@ -58,4 +58,4 @@ On [GitHub release page](https://github.com/pierrepo/autoclasswrapper/releases) 
 
 ### Zenodo integration
 
-After the creation  of the new release in GitHub, check the archive has been creating on [Zenodo](https://zenodo.org/deposit).
+After the creation  of the new release in GitHub, check the archive has been creating on [Zenodo](https://doi.org/10.5281/zenodo.2527058).
