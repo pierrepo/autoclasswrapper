@@ -1,13 +1,14 @@
 default: help
 
 init: ## Install miniconda
-	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+	wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
 	bash miniconda.sh -b -p ${HOME}/miniconda
-	. ${HOME}/miniconda/etc/profile.d/conda.sh
-	bash -c 'hash -r'
-	conda config --set always_yes yes --set changeps1 no
-	conda update -q conda
-	conda info -a
+	. ${HOME}/miniconda/etc/profile.d/conda.sh \
+	&& bash -c 'hash -r' \
+	&& conda init \
+	&& conda config --set always_yes yes --set changeps1 no \
+	&& conda update -q conda \
+	&& conda info -a
 .PHONY: init
 
 install: init ## Install dependencies
@@ -42,7 +43,7 @@ upload-to-pypi: ## Upload to PyPI
 	rm -f dist/*.tar.gz dist/*.whl dist/*.egg
 .PHONY: upload-to-pypi
 
-install-autoclass: init ## Install AutoClass C
+install-autoclass: ## Install AutoClass C
 	# https://ti.arc.nasa.gov/tech/rse/synthesis-projects-applications/autoclass/autoclass-c/
 	wget https://ti.arc.nasa.gov/m/project/autoclass/autoclass-c-3-3-6.tar.gz
 	tar zxvf autoclass-c-3-3-6.tar.gz
