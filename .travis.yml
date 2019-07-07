@@ -17,6 +17,7 @@ before_install:
     - sudo apt-get install -y libc6-i386
 
 install:
+    - travis_wait make init
     - conda create -n autoclasswrapper-dev python=${PYVER}
     - travis_wait conda env update -f environment-dev.yml -n autoclasswrapper-dev
     - travis_wait make install-autoclass
