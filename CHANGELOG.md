@@ -1,4 +1,6 @@
 **Dev**
+
+**1.5.0**
 - Print AutoClass C Version on run
 - Update jinja and urllib3 for security issues
 - Rename input.merge_dataframes() to input.prepare_input_data()
