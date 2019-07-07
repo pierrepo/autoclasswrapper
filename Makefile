@@ -1,41 +1,43 @@
 default: help
 
-init: ## Install pipenv
-	#this fix a temporary bug (09/10/2018) with pip 18.1
-	#https://github.com/pypa/pipenv/issues/2924
-	pip install pip==18.0
-	pip install pipenv
+init: ## Install miniconda
+	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+	bash miniconda.sh -b -p $HOME/miniconda
+	hash -r
+	export PATH="$HOME/miniconda/bin:$PATH"
+	conda config --set always_yes yes --set changeps1 no
+	conda update -q conda
+	conda info -a
 .PHONY: init
 
 install: init ## Install dependencies
-	pipenv install --dev --skip-lock
+	conda create env -f environment.yml
 .PHONY: install
 
 install-dev: init ## Install dependencies for development
-	pipenv install --dev
+	conda create env -f environment-dev.yml
 .PHONY: install-dev
 
 test: ## Run tests
-	pipenv run pytest tests
+	pytest tests
 .PHONY: test
 
 test-coverage: ## Run tests with coverage
-	pipenv run pytest --cov-config .coveragerc --cov=autoclasswrapper --cov-report term-missing
+	pytest --cov-config .coveragerc --cov=autoclasswrapper --cov-report term-missing
 .PHONY: test-coverage
 
 lint: ## Lint code
-	pipenv run pycodestyle autoclasswrapper \
-	&& pipenv run pydocstyle autoclasswrapper \
-	&& pipenv run pylint autoclasswrapper
+	pycodestyle autoclasswrapper \
+	&& pydocstyle autoclasswrapper \
+	&& pylint autoclasswrapper
 .PHONY: lint
 
 compile: ## Compile for PyPI
-	#pipenv run python setup.py sdist
-	pipenv run python setup.py bdist_wheel
+	python setup.py bdist_wheel
 .PHONY: compile
 
 upload-to-pypi: ## Upload to PyPI
-	pipenv run twine upload dist/*
+	twine upload dist/*
 	# clean compiled
 	rm -f dist/*.tar.gz dist/*.whl dist/*.egg
 .PHONY: upload-to-pypi
@@ -48,7 +50,7 @@ install-autoclass: init ## Install AutoClass C
 .PHONY: install-autoclass
 
 doc: doc/source ## Build documentation
-	cd doc && pipenv run make html
+	cd doc && make html
 .PHONY: doc
 
 clean-notebooks: ## Clean demo files
