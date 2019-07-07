@@ -10,7 +10,7 @@ Welcome to AutoClassWrapper's documentation!
 AutoClassWrapper is a Python wrapper to ease the use of Autoclass C.
 
 
-To install AutoClassWrapper, use:
+Install AutoClassWrapper with `pip`:
 
 .. code-block:: bash
 
