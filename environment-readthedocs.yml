@@ -1,0 +1,22 @@
+name: autoclasswrapper-dev
+# channels priority
+# see https://bioconda.github.io/
+# conda-forge has highest prioriy
+channels:
+  - defaults
+  - bioconda
+  - conda-forge
+dependencies:
+  - python=3.7
+  - pip
+  - numpy
+  - matplotlib
+  - pandas
+  - scipy
+  - chardet
+  - sphinx
+  - nbsphinx
+  - sphinx_rtd_theme
+  - pip:
+    - nbsphinx-link
+    - recommonmark
