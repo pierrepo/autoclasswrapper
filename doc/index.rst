@@ -3,7 +3,6 @@ Welcome to AutoClassWrapper's documentation!
 
 **Version** |release|
 
-
     AutoClass is an unsupervised Bayesian classification system.
     AutoClass C is an implementation of the AutoClass algorithm developed by the NASA in 1995.
 
@@ -58,10 +57,13 @@ Reference manual
     api/tools
 
 
-
-
 Index
 =====
 
 * :ref:`genindex`
 
+
+Recent Changes
+==============
+
+.. git_changelog::

@@ -20,3 +20,4 @@ dependencies:
   - pip:
     - nbsphinx-link
     - recommonmark
+    - sphinx-git

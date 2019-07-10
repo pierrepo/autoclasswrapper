@@ -36,7 +36,8 @@ extensions = ["sphinx.ext.mathjax",
               "sphinx.ext.napoleon", 
               "nbsphinx", 
               "nbsphinx_link",
-              "recommonmark"
+              "recommonmark",
+              "sphinx_git"
 ]
 
 
