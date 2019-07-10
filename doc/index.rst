@@ -60,10 +60,8 @@ Reference manual
 
 
 
-Indices and tables
-==================
+Index
+=====
 
 * :ref:`genindex`
-* :ref:`modindex`
-
 
