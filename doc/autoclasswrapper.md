@@ -58,7 +58,10 @@ clust.add_input_data("example1.tsv", "real scalar")
 clust.add_input_data("example2.tsv", "real location")
 ```
 
-Input data format is [tab-separated](https://en.wikipedia.org/wiki/Tab-separated_values) values. Together with the name of the input file, user must provide the type of data (either `real scalar`, `real location` or `discrete`). 
+Default input data format is [tab-separated](https://en.wikipedia.org/wiki/Tab-separated_values) values. If data are formated as [comma-separated](https://en.wikipedia.org/wiki/Comma-separated_values) values, use the `input_separator_char=","` parameter.
+
+
+Together with the name of the input file, user must provide the type of data (either `real scalar`, `real location` or `discrete`). 
 
 The default error on real values is 0.01. Error is relative for *real scalar* values (0.01 means 1%) but absolute for *real location* values. There is no error for *discrete* values. For *real scalar* and *real location* values, custom error can be defined with the `input_error` parameter of the `.add_input_data()` method.
 
@@ -123,5 +126,5 @@ The `.tsv` files contains:
 - The initial dataset.
 - A `main-class` column that gives the class with the highest probability.
 - A `main-class-proba` column that contains the actual probability value (between 0.0 and 1.0) of the most probable class.
-- `class-x-proba` columns (with `x` being a class number) that provide the probability to belong the `x` class.
+- `class-x-proba` columns (with `x` being a class number) that provide the probability to belong to the `x` class.
  
