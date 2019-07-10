@@ -50,7 +50,7 @@ install-autoclass: ## Install AutoClass C
 	rm -f autoclass-c-3-3-6.tar.gz
 .PHONY: install-autoclass
 
-doc: doc/source ## Build documentation
+doc: ## Build documentation
 	cd doc && make html
 .PHONY: doc
 
