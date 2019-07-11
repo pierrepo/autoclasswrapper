@@ -33,6 +33,7 @@ $ export PATH=$PATH:$(pwd)/autoclass-c
 $ sudo apt-get install -y libc6-i386
 ```
 
+
 # Data preparation 
 
 AutoClass C can handle 3 different types of data:
@@ -42,8 +43,6 @@ AutoClass C can handle 3 different types of data:
 - *discrete*: qualitative data. Examples: color, phenotype, name...
 
 Each data type must be entered in **separate input file** (one for each type).
-
-AutoClass C handles missing data. Missing data must be represented by nothing (no `NA`, `?`, `None`, `NULL`...).
 
 The usual workflow to prepare data is to instantiate an object from the `Input()` class:
 ```python
@@ -58,8 +57,12 @@ clust.add_input_data("example1.tsv", "real scalar")
 clust.add_input_data("example2.tsv", "real location")
 ```
 
-Default input data format is [tab-separated](https://en.wikipedia.org/wiki/Tab-separated_values) values. If data are formated as [comma-separated](https://en.wikipedia.org/wiki/Comma-separated_values) values, use the `input_separator_char=","` parameter.
+Default input data format is [tab-separated](https://en.wikipedia.org/wiki/Tab-separated_values) values. 
+If data are formated as [comma-separated](https://en.wikipedia.org/wiki/Comma-separated_values) values, use the `input_separator_char=","` parameter. 
 
+- The first line must be a header with column names. Avoid accentuated or special characters ($&!/β) or space. These characters will be automatically replaced by _. Avoid lengthy column names. Column names must be unique.
+- The first column must be gene/protein/object names. 
+- Missing data are allowed. They must be represented by nothing (no `NA`, `?`, `None`, `NULL`...).
 
 Together with the name of the input file, user must provide the type of data (either `real scalar`, `real location` or `discrete`). 
 
