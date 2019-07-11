@@ -47,7 +47,7 @@ AutoClassWrapper has been implemented with good practices in software developmen
 - continuous integration through tests,
 - and documentation (https://autoclasswrapper.readthedocs.io/en/latest/).
 
-AutoClassWrapper is available in the Python Package Index (PyPI). All versions of the software are archived in the Zenodo repository (https://doi.org/10.5281/zenodo.2527058) and in the Software Heritage archive (https://archive.softwareheritage.org/swh:1:dir:f888c9ca0a59d12e33ab16ba14d814c96c3648cd/).
+AutoClassWrapper is available in the Python Package Index (PyPI). All versions of the software are archived in the Zenodo repository (https://doi.org/10.5281/zenodo.2527058) and in the Software Heritage archive (https://archive.softwareheritage.org/swh:1:dir:330c16e8e3d999674f490135015d04de1f08e48a/).
 
 
 # References
