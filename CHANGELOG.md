@@ -1,4 +1,5 @@
 **Dev**
+- Create new release for paper in the Journal of Open Source Software
 
 **1.5.0**
 - Print AutoClass C Version on run
