@@ -1,4 +1,6 @@
 **Dev**
+
+**1.5.1**
 - Create new release for paper in the Journal of Open Source Software
 
 **1.5.0**
