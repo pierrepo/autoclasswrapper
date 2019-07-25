@@ -25,9 +25,9 @@ bibliography: paper.bib
 
 Data clustering or classification is widely used in many scientific fields and is often the very first step into exploratory data analysis.
 
-In 1996, the Ames Research Center at NASA has developed AutoClass [@cheeseman1996,  @stutz1996], an unsupervised Bayesian classification system, and its implementation in C, AutoClass C. The purpose of the Bayesian methodology is to find the classification that fits the data with the highest probability. The AutoClass algorithm is very efficient, notably in its ability to automatically find the best number of classes (or clusters) and to handle missing data. AutoClass can handle both real (numerical) and discrete values. It has been successful in classifying data as diverse as infrared spectra of stars [@goebel1989], protein structures [@hunter1992], introns from human DNA sequences [@cheeseman1996], Landsat satellites images [@cheeseman1996], body pattern in the common cuttlefish [@crook2002], patterns between rich and poor countries [@ardic2006], network traffic [@erman2006], or catchments in the Australian landscape [@anguswebb2007]. In proteomics and genomics, where thousands of proteins or genes are detected at once, the need for data classification is even more crucial. To this aim, AutoClass@IJM [@achcar2009], a web server that utilizes AutoClass C, has made Bayesian classification more accessible (see for instance results from [@simpson2011, @leger2015, @elliott2018]).
+In 1996, the Ames Research Center at NASA developed AutoClass [@cheeseman1996; @stutz1996], an unsupervised Bayesian classification system, and its implementation in C, AutoClass C. The purpose of the Bayesian methodology is to find the classification that fits the data with the highest probability. The AutoClass algorithm is very efficient, notably in its ability to automatically find the best number of classes (or clusters) and to handle missing data. AutoClass can handle both real (numerical) and discrete values. It has been successful in classifying data as diverse as infrared spectra of stars [@goebel1989], protein structures [@hunter1992], introns from human DNA sequences [@cheeseman1996], Landsat satellites images [@cheeseman1996], body pattern in the common cuttlefish [@crook2002], patterns between rich and poor countries [@ardic2006], network traffic [@erman2006], or catchments in the Australian landscape [@anguswebb2007]. In proteomics and genomics, where thousands of proteins or genes are detected at once, the need for data classification is even more crucial. To this aim, AutoClass@IJM [@achcar2009], a web server that utilizes AutoClass C, has made Bayesian classification more accessible (see for instance results from [@simpson2011; @leger2015; @elliott2018]).
 
-Albeit its proven efficiency and versatility, AutoClass C is not easy to configure and run locally for the end user. As far as we know of, there is only a [R wrapper ](https://github.com/wikiselev/autoclass-c) developed by M. Spivakov but with a limited interface.
+Albeit its proven efficiency and versatility, AutoClass C is not easy to configure and run locally for the end user. As far as we know of, there is only an [R wrapper](https://github.com/wikiselev/autoclass-c) developed by M. Spivakov but with a limited interface.
 
 
 # Overview
@@ -40,7 +40,7 @@ The AutoClassWrapper library is a Python wrapper for AutoClass C. It aims to eas
 
 For all classes, descriptive statistics of numerical features are produced. An additional hierarchical clustering is performed on output classes and provides, through a dendrogram, a convenient way to assess proximity between classes.
 
-AutoClassWrapper has been implemented with good practices in software development in mind [@jimenez2017, @taschuk2017]:
+AutoClassWrapper has been implemented with good practices in software development in mind [@jimenez2017; @taschuk2017]:
 
 - version control repository on GitHub (https://github.com/pierrepo/autoclasswrapper),
 - open-source license (BSD-3-Clause),
