@@ -1,10 +1,14 @@
 {
-    "title": "autoclasswrapper (v1.5.1): A Python wrapper for AutoClass C classification",
+    "title": "AutoClassWrapper (v1.5.1): A Python wrapper for AutoClass C classification",
     "creators": [{
+        "name": "Camadro, Jean-Michel",
+        "orcid": "0000-0002-8549-2707"
+    },
+    {
         "name": "Poulain, Pierre",
         "orcid": "0000-0003-4177-3619"
     }],
-    "description": "This repository contains the archived release for the software autoclasswrapper",
+    "description": "This repository contains the archived release for the software AutoClassWrapper",
     "access_right": "open",
     "license": "bsd-3-clause",
     "keywords": [
