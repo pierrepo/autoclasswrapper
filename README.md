@@ -3,7 +3,8 @@
 [![License: BSD](https://img.shields.io/badge/License-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)   [![autoclasswrapper version on PyPI](https://badge.fury.io/py/autoclasswrapper.svg)](https://pypi.python.org/pypi/autoclasswrapper)   [![Build Status](https://travis-ci.org/pierrepo/autoclasswrapper.svg?branch=master)](https://travis-ci.org/pierrepo/autoclasswrapper)
 [![Documentation Status](https://readthedocs.org/projects/autoclasswrapper/badge/?version=latest)](https://autoclasswrapper.readthedocs.io/en/latest/?badge=latest)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/pierrepo/autoclasswrapper/master?filepath=notebooks)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2527058.svg)](https://doi.org/10.5281/zenodo.2527058)
+[![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2527058.svg)](https://doi.org/10.5281/zenodo.2527058)
+[![JOSS DOI](http://joss.theoj.org/papers/10.21105/joss.01390/status.svg)](https://doi.org/10.21105/joss.01390)
 
 
 AutoClass is an unsupervised Bayesian classification system.
